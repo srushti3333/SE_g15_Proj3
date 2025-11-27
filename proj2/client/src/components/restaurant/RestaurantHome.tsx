@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom'; // NEW - Add this import
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../../contexts/AuthContext';
 import { api } from '../../services/api';
@@ -42,6 +43,33 @@ const RestaurantHome: React.FC = () => {
       <div className="welcome-section">
         <h2>Welcome to your restaurant dashboard! 🍽️</h2>
         <p>Manage your orders, update your menu, and grow your business.</p>
+      </div>
+
+      {/* NEW SECTION - Quick Actions */}
+      <div className="quick-actions">
+        <Link to="/restaurant/orders" className="action-card">
+          <div className="action-icon">📦</div>
+          <h3>Manage Orders</h3>
+          <p>View and process all orders</p>
+        </Link>
+        
+        <Link to="/restaurant/menu" className="action-card">
+          <div className="action-icon">📋</div>
+          <h3>Menu Management</h3>
+          <p>Update your menu items</p>
+        </Link>
+
+        <Link to="/restaurant/analytics" className="action-card">
+          <div className="action-icon">📊</div>
+          <h3>Analytics Dashboard</h3>
+          <p>View performance insights</p>
+        </Link>
+
+        <Link to="/restaurant/profile" className="action-card">
+          <div className="action-icon">👤</div>
+          <h3>Profile Settings</h3>
+          <p>Manage your restaurant profile</p>
+        </Link>
       </div>
 
       <div className="quick-stats">
