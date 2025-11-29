@@ -1,4 +1,5 @@
 const express = require('express');
+const { db } = require('../config/firebase');
 const Quest = require('../models/Quest');
 const UserQuest = require('../models/UserQuest');
 const Order = require('../models/Order');
