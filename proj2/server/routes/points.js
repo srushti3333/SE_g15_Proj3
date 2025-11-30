@@ -236,4 +236,52 @@ async function awardPointsForOrder(customerId, orderAmount) {
   }
 }
 
-module.exports = { router, awardPointsForOrder };
+// Award points (generic function for quests, etc.)
+async function awardPoints(customerId, points, description) {
+  try {
+    const pointsRef = db.collection('points').doc(customerId);
+    const pointsDoc = await pointsRef.get();
+    
+    let pointsData;
+    if (pointsDoc.exists) {
+      pointsData = pointsDoc.data();
+    } else {
+      pointsData = {
+        totalPoints: 0,
+        availablePoints: 0,
+        usedPoints: 0,
+        transactions: [],
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+    }
+    
+    // Update points
+    pointsData.totalPoints += points;
+    pointsData.availablePoints += points;
+    pointsData.updatedAt = new Date();
+    
+    // Add transaction
+    const transaction = {
+      id: Date.now().toString(),
+      type: 'earned',
+      amount: points,
+      description: description,
+      date: new Date()
+    };
+    pointsData.transactions.unshift(transaction);
+    
+    // Keep only last 50 transactions
+    if (pointsData.transactions.length > 50) {
+      pointsData.transactions = pointsData.transactions.slice(0, 50);
+    }
+    
+    await pointsRef.set(pointsData);
+    console.log(`Awarded ${points} points to customer ${customerId}: ${description}`);
+    
+  } catch (error) {
+    console.error('Error awarding points:', error);
+  }
+}
+
+module.exports = { router, awardPointsForOrder, awardPoints };
