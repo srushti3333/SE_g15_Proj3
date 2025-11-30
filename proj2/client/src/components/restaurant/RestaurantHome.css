@@ -113,6 +113,7 @@
   font-size: 0.95rem;
 }
 
+/* Pending Orders */
 .pending-orders {
   margin-top: 3rem;
 }
@@ -232,7 +233,7 @@
     gap: 15px;
     text-align: center;
   }
-  
+
   .order-actions {
     justify-content: center;
     width: 100%;
@@ -242,3 +243,5 @@
     flex: 1;
   }
 }
+
+
