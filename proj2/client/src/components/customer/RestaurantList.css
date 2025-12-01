@@ -93,6 +93,13 @@
   margin-top: 1rem;
 }
 
+.restaurant-address {
+  font-size: 0.95rem;
+  color: #666;
+  margin: 0.25rem 0 0.75rem 0;
+}
+
+
 /* Menu View */
 .menu-view {
   background: white;

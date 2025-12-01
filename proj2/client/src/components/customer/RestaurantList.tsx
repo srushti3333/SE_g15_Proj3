@@ -34,68 +34,74 @@ const RestaurantList: React.FC = () => {
   };
 
   interface Restaurant {
-  id: string;
-  name: string;
-  location?: { lat: number; lng: number };
-  cuisine?: string;
-  rating?: number;
-  totalRatings?: number;
-  description?: string;
-  deliveryTime?: string;
-  isLocalLegend?: boolean;
-  menu?: MenuItem[];
-}
+    id: string;
+    name: string;
+    location?: { lat: number; lng: number };
+    cuisine?: string;
+    rating?: number;
+    totalRatings?: number;
+    description?: string;
+    deliveryTime?: string; // fallback
+    isLocalLegend?: boolean;
+    menu?: MenuItem[];
+    address?: {
+      street?: string;
+      city?: string;
+      state?: string;
+      zipCode?: string;
+    };
+  }
 
-interface MenuItem {
-  id: string;
-  name: string;
-  description?: string;
-  price: number;
-}
+  interface MenuItem {
+    id: string;
+    name: string;
+    description?: string;
+    price: number;
+  }
 
-interface RestaurantWithDistance extends Restaurant {
-  distanceKm?: number | null;
-}
+  interface RestaurantWithDistance extends Restaurant {
+    distanceKm?: number | null;
+  }
 
-const { data: restaurants, isLoading, isError, refetch } = useQuery<RestaurantWithDistance[], Error>({
-  queryKey: ['restaurants', coords, radiusKm],
-  queryFn: async () => {
-    const response = await api.get('/customer/restaurants', {
-      headers: { 'Cache-Control': 'no-cache' },
-    });
-    const allRestaurants: Restaurant[] = response.data.restaurants;
+  const { data: restaurants, isLoading, isError, refetch } = useQuery<RestaurantWithDistance[], Error>({
+    queryKey: ['restaurants', coords, radiusKm],
+    queryFn: async () => {
+      const response = await api.get('/customer/restaurants', {
+        headers: { 'Cache-Control': 'no-cache' },
+      });
+      const allRestaurants: Restaurant[] = response.data.restaurants;
 
-    const restaurantsWithDistance: RestaurantWithDistance[] = allRestaurants.map((r) => {
-      const distanceKm = coords.lat != null && coords.lng != null && r.location
-        ? getDistanceKm(coords.lat, coords.lng, r.location.lat, r.location.lng)
-        : null;
+      const restaurantsWithDistance: RestaurantWithDistance[] = allRestaurants.map((r) => {
+        const distanceKm = coords.lat != null && coords.lng != null && r.location
+          ? getDistanceKm(coords.lat, coords.lng, r.location.lat, r.location.lng)
+          : null;
 
-      console.log(`Restaurant: ${r.name}, Distance: ${distanceKm?.toFixed(2) ?? 'N/A'} km`);
+        console.log(`Restaurant: ${r.name}, Distance: ${distanceKm?.toFixed(2) ?? 'N/A'} km`);
 
-      return { ...r, distanceKm };
-    });
+        return { ...r, distanceKm };
+      });
 
-    console.log('User coords:', coords);
-    
-    
-    restaurantsWithDistance.forEach(r => {
-      console.log('Restaurant object:', r);
-      console.log(`${r.name}: ${r.distanceKm?.toFixed(2) ?? 'N/A'} km`);
-    });
+      console.log('User coords:', coords);
+      
+      
+      restaurantsWithDistance.forEach(r => {
+        console.log('Restaurant object:', r);
+        console.log(`${r.name}: ${r.distanceKm?.toFixed(2) ?? 'N/A'} km`);
+      });
 
 
-    // If radiusKm is set, filter by distance, else return all
-    if (radiusKm && coords.lat != null && coords.lng != null) {
-      return restaurantsWithDistance.filter(
-        (r) => r.distanceKm != null && r.distanceKm <= radiusKm
-      );
-    }
+      // If radiusKm is set, filter by distance, else return all
+      if (radiusKm && coords.lat != null && coords.lng != null) {
+        return restaurantsWithDistance.filter(
+          (r) => r.distanceKm != null && r.distanceKm <= radiusKm
+        );
+      }
 
-    return restaurantsWithDistance;
-  },
-  enabled: true,
-  refetchOnWindowFocus: false,
-});
+      return restaurantsWithDistance;
+    },
+    enabled: true,
+    refetchOnWindowFocus: false,
+  });
 
 
   // Fetch ratings for selected restaurant
@@ -131,6 +137,16 @@ const { data: restaurants, isLoading, isError, refetch } = useQuery<RestaurantWi
       alert('Failed to add to wishlist. Please try again.');
     }
   });
+
+  // utility to estimate delivery time based on distance
+  const estimateDeliveryTime = (distanceKm: number | null) => {
+    if (distanceKm == null) return '30-45 min'; // default
+    if (distanceKm <= 1) return '10-15 min';
+    if (distanceKm <= 3) return '15-25 min';
+    if (distanceKm <= 5) return '25-35 min';
+    return '35-50 min';
+  };
+
 
   // Get user location
   useEffect(() => {
@@ -243,18 +259,31 @@ const { data: restaurants, isLoading, isError, refetch } = useQuery<RestaurantWi
       {!selectedRestaurant ? (
         <div className="restaurants-grid">
           {restaurants?.map((restaurant: any) => (
-            <div key={restaurant.id} className="restaurant-card">
+            <div className="restaurant-card">
               <div className="restaurant-header">
                 <h3>{restaurant.name}</h3>
                 {restaurant.isLocalLegend && <span className="local-legend-badge">🏆 Local Legend</span>}
               </div>
+
               <p className="restaurant-cuisine">{restaurant.cuisine}</p>
+              
+              {restaurant.address && (
+                <p className="restaurant-address">
+                  📍 {restaurant.address.street}, {restaurant.address.city}, {restaurant.address.state} {restaurant.address.zipCode}
+                </p>
+              )}
+
               <div className="restaurant-rating">
                 <span className="rating">⭐ {restaurant.rating}</span>
                 {restaurant.totalRatings > 0 && <span className="rating-count">({restaurant.totalRatings} reviews)</span>}
-                <span className="delivery-time">{restaurant.deliveryTime}</span>
+                <span className="delivery-time">
+                  ⏱ {estimateDeliveryTime(restaurant.distanceKm)}
+                  {restaurant.distanceKm != null && ` — ${restaurant.distanceKm.toFixed(1)} km away`}
+                </span>
               </div>
+
               <p>{restaurant.description || 'Delicious food awaits you!'}</p>
+              
               <div className="restaurant-actions">
                 <button onClick={() => setSelectedRestaurant(restaurant)} className="btn btn-primary">View Menu</button>
                 <button
