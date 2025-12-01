@@ -1,6 +1,16 @@
 const { db } = require('../config/firebase');
 const geofire = require('geofire-common');
 
+function isValidCoordinate(location) {
+  return (
+    location &&
+    typeof location.lat === "number" &&
+    typeof location.lng === "number" &&
+    !isNaN(location.lat) &&
+    !isNaN(location.lng)
+  );
+}
+
 class Restaurant {
   constructor(data) {
     this.id = data.id;
@@ -30,22 +40,32 @@ class Restaurant {
     try {
       const restaurantRef = db.collection('restaurants').doc();
 
-      const geohash = restaurantData.location ? geofire.geohashForLocation([restaurantData.location.lat, restaurantData.location.lng]) : null;
+      let geohash = null;
+      if (isValidCoordinate(restaurantData.location)) {
+        geohash = geofire.geohashForLocation([
+          restaurantData.location.lat,
+          restaurantData.location.lng
+        ]);
+      }
 
       const restaurantDoc = {
         id: restaurantRef.id,
         ...restaurantData,
+        location: isValidCoordinate(restaurantData.location)
+          ? restaurantData.location
+          : null,
         geohash,
         createdAt: new Date(),
         updatedAt: new Date()
       };
-      
+
       await restaurantRef.set(restaurantDoc);
       return new Restaurant(restaurantDoc);
     } catch (error) {
       throw new Error(`Failed to create restaurant: ${error.message}`);
     }
   }
+
 
   // Get restaurant by ID
   static async findById(id) {
@@ -90,27 +110,29 @@ class Restaurant {
     }
   }
 
-  // Update restaurant + update geohash if location changes
+  // Update restaurant + safely update geohash if location changes
   async update(updateData) {
     try {
-
-      let updatePayload = { 
-          ...updateData, 
-          updatedAt: new Date() 
+      let updatePayload = {
+        ...updateData,
+        updatedAt: new Date()
       };
 
-      if (updateData.location) {
-        updatePayload.geohash = geofire.geohashForLocation([
-          updateData.location.lat,
-          updateData.location.lng,
-        ]);
+      // Location updated?
+      if ("location" in updateData) {
+        if (isValidCoordinate(updateData.location)) {
+          updatePayload.geohash = geofire.geohashForLocation([
+            updateData.location.lat,
+            updateData.location.lng
+          ]);
+        } else {
+          updatePayload.location = null;
+          updatePayload.geohash = null; // reset
+        }
       }
 
-      const restaurantRef = db.collection('restaurants').doc(this.id);
-      
-      await restaurantRef.update(updatePayload);
-      
-      // Update local instance
+      await db.collection('restaurants').doc(this.id).update(updatePayload);
+
       Object.assign(this, updatePayload);
       return this;
     } catch (error) {

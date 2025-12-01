@@ -3,6 +3,8 @@ const { body, validationResult } = require('express-validator');
 const User = require('../models/User');
 const Restaurant = require('../models/Restaurant');
 
+const geofire = require("geofire-common");
+
 const router = express.Router();
 
 // Get customer profile by email and password
@@ -121,7 +123,12 @@ router.get('/restaurants', async (req, res) => {
           phone: userData.profile.phone || '',
           email: userData.email,
           isActive: true,
-          ownerId: doc.id
+          ownerId: doc.id,
+          location: userData.profile.location || null,
+          geohash: userData.profile.location
+            ? geofire.geohashForLocation([userData.profile.location.lat, userData.profile.location.lng])
+            : null
+
         };
         restaurants.push(restaurant);
       }

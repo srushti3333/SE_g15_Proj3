@@ -186,12 +186,19 @@ router.get('/nearby', async (req, res) => {
   try {
     const { lat, lng, radius } = req.query;
 
+    // Validate required params
     if (!lat || !lng) {
       return res.status(400).json({ error: 'lat and lng are required' });
     }
 
     const center = [parseFloat(lat), parseFloat(lng)];
-    const radiusInM = radius ? parseInt(radius) : 5000; // default 5km
+
+    // Parse radius from query, fallback to 5000m
+    let radiusInM = 5000;
+    if (radius) {
+      const r = parseInt(radius, 10);
+      if (!isNaN(r) && r > 0) radiusInM = r;
+    }
 
     const bounds = geofire.geohashQueryBounds(center, radiusInM);
     const promises = [];
@@ -214,7 +221,6 @@ router.get('/nearby', async (req, res) => {
     snapshots.forEach(snap => {
       snap.forEach(doc => {
         const data = doc.data();
-
         if (!data.location) return;
 
         const distance = geofire.distanceBetween(

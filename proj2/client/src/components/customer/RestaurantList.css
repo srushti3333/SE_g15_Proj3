@@ -431,3 +431,51 @@
     flex: 1;
   }
 }
+
+/* Radius Input */
+
+.radius-input {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.radius-input label {
+  font-size: 1rem;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.radius-input input[type="number"] {
+  width: 80px;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  outline: none;
+  transition: border 0.2s, box-shadow 0.2s;
+}
+
+.radius-input input[type="number"]:focus {
+  border-color: #ff6b6b;
+  box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.2);
+}
+
+.radius-input button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 8px;
+  background: #ff6b6b;
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.radius-input button:hover {
+  background: #ff5252;
+  transform: translateY(-2px);
+}
