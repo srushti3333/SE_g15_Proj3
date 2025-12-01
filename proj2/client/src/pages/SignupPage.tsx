@@ -17,6 +17,10 @@ const SignupPage: React.FC = () => {
         state: '',
         zipCode: ''
       },
+      location: {
+        lat: null as number | null,
+        lng: null as number | null
+      },
       // Restaurant-specific fields
       cuisine: '',
       description: '',
@@ -65,20 +69,112 @@ const SignupPage: React.FC = () => {
     }
   };
 
+  const geocodeAddress = async (): Promise<{lat: number, lng: number} | null> => {
+    const { street, city, state, zipCode } = formData.profile.address;
+    const fullAddress = `${street}, ${city}, ${state}, ${zipCode}`;
+
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout
+
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(fullAddress)}`,
+        { signal: controller.signal }
+      );
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        throw new Error(`Geocoding API error: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+
+      if (!data || data.length === 0) {
+        throw new Error('Address not found. Please check your input.');
+      }
+
+      return {
+        lat: parseFloat(data[0].lat),
+        lng: parseFloat(data[0].lon)
+      };
+
+    } catch (err: any) {
+      if (err.name === 'AbortError') {
+        throw new Error('Geocoding request timed out. Please try again.');
+      }
+      throw new Error(err.message || 'Failed to fetch location');
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
     try {
-      await register(formData);
+      let updatedData = { ...formData };
+
+      // Only geocode for restaurant role
+      if (formData.role === 'restaurant') {
+        const coords = await (async (): Promise<{ lat: number; lng: number } | null> => {
+          const { street, city, state, zipCode } = formData.profile.address;
+          const fullAddress = `${street}, ${city}, ${state}, ${zipCode}`;
+
+          try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+            const response = await fetch(
+              `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(fullAddress)}`,
+              { signal: controller.signal }
+            );
+
+            clearTimeout(timeoutId);
+
+            if (!response.ok) {
+              throw new Error(`Geocoding API error: ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            if (!data || data.length === 0) {
+              return null;
+            }
+
+            return {
+              lat: parseFloat(data[0].lat),
+              lng: parseFloat(data[0].lon),
+            };
+          } catch (err: any) {
+            if (err.name === 'AbortError') {
+              throw new Error('Geocoding request timed out. Please try again.');
+            }
+            throw new Error(err.message || 'Failed to fetch location.');
+          }
+        })();
+
+        // Always assign a location object to satisfy TS type
+        if (!coords) {
+          setError('Could not detect coordinates for the given address. Please check your input.');
+          setLoading(false);
+          return;
+        }
+
+        updatedData.profile.location = { lat: coords.lat, lng: coords.lng };
+      }
+
+      // Submit registration
+      await register(updatedData);
       navigate('/');
+
     } catch (err: any) {
-      setError(err.message);
+      console.error('Signup error:', err);
+      setError(err.message || 'Signup failed. Please try again.');
     } finally {
       setLoading(false);
     }
   };
+
 
   const renderRoleSpecificFields = () => {
     switch (formData.role) {

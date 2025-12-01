@@ -293,6 +293,46 @@ Update restaurant menu.
 }
 ```
 
+
+#### GET /restaurant/nearby
+
+Get restaurants near a user's location within a radius.
+
+**Query Parameters:**
+Param	Type -	Required -	Description
+lat	number - yes -	User latitude
+lng	number -	yes -	User longitude
+radius	number	- no	- Search radius in meters (default: 5000)
+
+**Example Request:**
+
+GET /restaurant/nearby?lat=37.7749&lng=-122.4194&radius=3000
+
+**Response Example:**
+```json
+{
+  "count": 2,
+  "restaurants": [
+    {
+      "id": "abc123",
+      "name": "Pizza Palace",
+      "cuisine": "Italian",
+      "distance": 521.4,
+      "location": {
+        "lat": 37.7751,
+        "lng": -122.4195
+      }
+    },
+    {
+      "id": "def456",
+      "name": "Burger Hub",
+      "cuisine": "American",
+      "distance": 2420.8
+    }
+  ]
+}
+```
+
 ### Delivery
 
 #### GET /delivery/profile

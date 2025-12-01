@@ -1,4 +1,5 @@
 const { db } = require('../config/firebase');
+const geofire = require('geofire-common');
 
 class Restaurant {
   constructor(data) {
@@ -11,6 +12,11 @@ class Restaurant {
     this.isLocalLegend = data.isLocalLegend || false;
     this.menu = data.menu || [];
     this.ownerId = data.ownerId;
+
+    // NEW: location support
+    this.location = data.location || null;  // {lat, lng}
+    this.geohash = data.geohash || null;
+
     this.address = data.address;
     this.phone = data.phone;
     this.email = data.email;
@@ -23,9 +29,13 @@ class Restaurant {
   static async create(restaurantData) {
     try {
       const restaurantRef = db.collection('restaurants').doc();
+
+      const geohash = restaurantData.location ? geofire.geohashForLocation([restaurantData.location.lat, restaurantData.location.lng]) : null;
+
       const restaurantDoc = {
         id: restaurantRef.id,
         ...restaurantData,
+        geohash,
         createdAt: new Date(),
         updatedAt: new Date()
       };
@@ -80,14 +90,23 @@ class Restaurant {
     }
   }
 
-  // Update restaurant
+  // Update restaurant + update geohash if location changes
   async update(updateData) {
     try {
-      const restaurantRef = db.collection('restaurants').doc(this.id);
-      const updatePayload = {
-        ...updateData,
-        updatedAt: new Date()
+
+      let updatePayload = { 
+          ...updateData, 
+          updatedAt: new Date() 
       };
+
+      if (updateData.location) {
+        updatePayload.geohash = geofire.geohashForLocation([
+          updateData.location.lat,
+          updateData.location.lng,
+        ]);
+      }
+
+      const restaurantRef = db.collection('restaurants').doc(this.id);
       
       await restaurantRef.update(updatePayload);
       
@@ -138,6 +157,8 @@ class Restaurant {
       isLocalLegend: this.isLocalLegend,
       menu: this.menu,
       ownerId: this.ownerId,
+      location: this.location,
+      geohash: this.geohash,
       address: this.address,
       phone: this.phone,
       email: this.email,
