@@ -205,11 +205,6 @@ Discover nearby restaurants with geolocation and distance sorting
 ![Express](https://img.shields.io/badge/Express-4.18.2-000000?logo=express)
 ![Firebase Admin](https://img.shields.io/badge/Firebase_Admin-11.11.1-FFCA28?logo=firebase)
 
-### Testing & Quality
-![Jest](https://img.shields.io/badge/Jest-29.6.2-C21325?logo=jest)
-![ESLint](https://img.shields.io/badge/ESLint-Latest-4B32C3?logo=eslint)
-![Codecov](https://img.shields.io/badge/Coverage-70%25-brightgreen?logo=codecov)
-
 ---
 
 ## 🏆 Badge Setup (For Forked Repos)
