@@ -73,7 +73,7 @@ const DeliveryHome: React.FC = () => {
         <p>Manage your delivery assignments and track your orders.</p>
       </div>
 
-      <div className="orders-overview">
+      <div className="orders-overview" role="region" aria-label="Orders Overview">
         <div className="stat-card">
           <div className="stat-icon">📦</div>
           <div className="stat-content">
