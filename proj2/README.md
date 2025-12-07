@@ -1,6 +1,6 @@
 # 🐺 Hungry Wolf - Gamified Food Delivery Platform
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17850433.svg)](https://doi.org/10.5281/zenodo.XXXXXXX)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17850433.svg)](https://doi.org/10.5281/zenodo.17850433)
 <!-- Replace XXXXXXX with your actual DOI number after creating a GitHub release -->
 [![Build Status](https://github.com/srushti3333/SE_g15_Proj3/actions/workflows/ci.yml/badge.svg)](https://github.com/srushti3333/SE_g15_Proj3/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/github/srushti3333/SE_g15_Proj3/graph/badge.svg?token=6c4b845f-de6f-42f2-811f-736a0371b841)](https://codecov.io/github/srushti3333/SE_g15_Proj3)
