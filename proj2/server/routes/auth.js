@@ -108,20 +108,14 @@ router.post('/profile', [
 // Update user profile by email and password
 router.put('/profile', [
   body('email').isEmail().normalizeEmail(),
-  body('password').isLength({ min: 1 }),
   body('profile').isObject()
 ], async (req, res) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
-    const { email, password, profile } = req.body;
+    const { email, profile } = req.body;
     const user = await User.findByEmail(email);
-    
-    if (!user || user.password !== password) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+
+    if (!user) {
+      return res.status(401).json({ error: 'User not found' });
     }
 
     const updatedUser = await user.update({ profile });
@@ -135,5 +129,6 @@ router.put('/profile', [
     res.status(500).json({ error: error.message });
   }
 });
+
 
 module.exports = router;

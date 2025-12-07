@@ -109,6 +109,12 @@ const Navbar: React.FC = () => {
                 <span className="user-role">
                   {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
                 </span>
+
+                {/* Link to profile page */}
+                <Link to="/customer/profile" className="btn btn-secondary">
+                  Profile
+                </Link>
+
                 <button onClick={handleLogout} className="btn-logout">
                   Logout
                 </button>
