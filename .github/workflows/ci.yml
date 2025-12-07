@@ -41,8 +41,8 @@ jobs:
         if: always() 
         uses: codecov/codecov-action@v4
         with:
-          token: 6c4b845f-de6f-42f2-811f-736a0371b841
-          files: ./coverage/lcov.info
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./proj2/coverage/lcov.info
           fail_ci_if_error: false
           verbose: true
 
