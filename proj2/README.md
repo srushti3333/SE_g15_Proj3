@@ -1,6 +1,7 @@
 # 🐺 Hungry Wolf - Gamified Food Delivery Platform
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.XXXXXXX.svg)](https://doi.org/10.5281/zenodo.XXXXXXX)
+<!-- Replace XXXXXXX with your actual DOI number after creating a GitHub release -->
 [![Build Status](https://github.com/srushti3333/SE_g15_Proj3/actions/workflows/ci.yml/badge.svg)](https://github.com/srushti3333/SE_g15_Proj3/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/github/srushti3333/SE_g15_Proj3/graph/badge.svg?token=6c4b845f-de6f-42f2-811f-736a0371b841)](https://codecov.io/github/srushti3333/SE_g15_Proj3)
 [![ESLint](https://img.shields.io/badge/code_style-ESLint-blue.svg)](https://eslint.org/)
@@ -99,35 +100,26 @@ Discover nearby restaurants with geolocation and distance sorting
 
 ### 🍂 October Release - Foundation Features ✅
 
-#### Milestone 1: 🎮 Gamification Engine
-*"Making food delivery addictively fun"*
-- Quest system with 5+ challenge types (order count, spending, cuisine exploration)
-- Real-time progress tracking with visual indicators
-- Points economy with 50% bonus for Local Legend restaurants
-- Achievement badges and reward redemption system
-- Weekend Warrior and Cuisine Explorer special quests
+#### Milestone 1: Onboarding
+- Role-specific sign-up and login
+- Database integration with Firebase
+- Dashboard views for each role
 
-#### Milestone 2: 📊 Business Intelligence Dashboard
-*"Data-driven decisions for platform growth"*
-- Executive dashboard with 15+ key performance indicators
-- Customer lifetime value and retention analytics
-- Restaurant performance leaderboards and revenue tracking
-- Order trend analysis with peak time identification
-- Social impact metrics for Meal-for-a-Meal donations
+#### Milestone 2: Core Order Flow
+- Customer cart and order placement
+- Restaurant order management
+- Delivery partner assignment
+- Rating system
 
-#### Milestone 3: 🔄 Smart Reordering System
-*"Your favorites, just one click away"*
-- Instant reorder from order history
-- Saved preferences and customizations
-- Quick access to frequently ordered items
-- Order history with detailed receipts
+#### Milestone 3: Gamification
+- Points system for orders (10% of bill)
+- Points display on dashboard
+- Rewards and discounts
 
-#### Milestone 4: 📍 Location Intelligence
-*"Discover great food around you"*
-- GPS-powered restaurant discovery
-- Distance-based sorting and filtering
-- Geofencing for delivery zones
-- "Near Me" quick search functionality
+#### Milestone 4: Social Impact
+- Local Legends restaurants
+- Meal-for-a-Meal donation counter
+- Enhanced reward points (15%) for local restaurants
 
 ### 🍁 November Release - Engagement Amplifiers ✅
 
@@ -515,6 +507,18 @@ Secure data transmission
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE.md](docs/LICENSE.md) file for details.
+
+---
+
+## 👨‍💻 Team
+
+**Group 15 - Fall 2025**
+
+- Team Member 1 - [GitHub](https://github.com/member1)
+- Team Member 2 - [GitHub](https://github.com/member2)
+- Team Member 3 - [GitHub](https://github.com/member3)
+- Team Member 4 - [GitHub](https://github.com/member4)
+- Team Member 5 - [GitHub](https://github.com/member5)
 
 ---
 
