@@ -132,20 +132,130 @@ async function testLogin() {
   }
 }
 
-// Run all tests
+// Test 5: Test getting user profile
+async function testGetProfile() {
+  console.log('\n5. Testing Get Profile:');
+  const User = require('./models/User');
+  const axios = require('axios');
+
+  const testEmail = `profile_test${Date.now()}@example.com`;
+  const testPassword = 'test123456';
+
+  try {
+    // Create test user
+    const testUser = await User.create({
+      email: testEmail,
+      password: testPassword,
+      role: 'customer',
+      profile: {
+        name: 'Profile Test User',
+        phone: '9876543210',
+        address: {
+          street: '456 Test Ave',
+          city: 'Testville',
+          state: 'TS',
+          zipCode: '54321'
+        }
+      }
+    });
+
+    console.log('   ✓ Test user created for profile test');
+
+    // Call /profile endpoint
+    const response = await axios.post(`http://localhost:${process.env.PORT || 3000}/auth/profile`, {
+      email: testEmail,
+      password: testPassword
+    });
+
+    if (response.data.user && response.data.user.email === testEmail) {
+      console.log('   ✓ Profile fetched successfully');
+    } else {
+      console.log('   ✗ Profile fetch failed');
+    }
+
+    // Clean up
+    await testUser.delete();
+    console.log('   ✓ Test user cleaned up');
+
+    return true;
+  } catch (error) {
+    console.log('   ✗ Get profile test failed');
+    console.log('   Error:', error.message);
+    return false;
+  }
+}
+
+// Test 6: Test updating user profile
+async function testUpdateProfile() {
+  console.log('\n6. Testing Update Profile:');
+  const User = require('./models/User');
+  const axios = require('axios');
+
+  const testEmail = `update_test${Date.now()}@example.com`;
+  const testPassword = 'test123456';
+
+  try {
+    // Create test user
+    const testUser = await User.create({
+      email: testEmail,
+      password: testPassword,
+      role: 'customer',
+      profile: {
+        name: 'Update Test User',
+        phone: '9876543210',
+        address: {
+          street: '789 Test Blvd',
+          city: 'Testopolis',
+          state: 'TS',
+          zipCode: '67890'
+        }
+      }
+    });
+
+    console.log('   ✓ Test user created for update profile test');
+
+    // Call /profile PUT endpoint
+    const newProfile = {
+      name: 'Updated Name',
+      phone: '1112223333'
+    };
+
+    const response = await axios.put(`http://localhost:${process.env.PORT || 3000}/auth/profile`, {
+      email: testEmail,
+      profile: newProfile
+    });
+
+    if (response.data.user && response.data.user.profile.name === 'Updated Name') {
+      console.log('   ✓ Profile updated successfully');
+    } else {
+      console.log('   ✗ Profile update failed');
+    }
+
+    // Clean up
+    await testUser.delete();
+    console.log('   ✓ Test user cleaned up');
+
+    return true;
+  } catch (error) {
+    console.log('   ✗ Update profile test failed');
+    console.log('   Error:', error.message);
+    return false;
+  }
+}
+
+// Update runTests to include profile tests
 async function runTests() {
   try {
     const firestoreOk = await testFirestore();
-    
+
     if (firestoreOk) {
       await testUserCreation();
       await testLogin();
+      await testGetProfile();
+      await testUpdateProfile();
     }
-    
+
     console.log('\n✅ All diagnostic tests completed!');
-    console.log('\nIf all tests passed, registration and login should work.');
-    console.log('If any tests failed, check the error messages above.\n');
-    
     process.exit(0);
   } catch (error) {
     console.error('\n❌ Test suite failed with error:', error);
