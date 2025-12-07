@@ -168,12 +168,22 @@ router.get('/:id', async (req, res) => {
       updatedAt: orderDoc.data().updatedAt?.toDate?.() || new Date()
     };
 
-    res.json({ order });
+    // optionally attach live location if rider assigned
+    let liveLocation = null;
+    if (order.deliveryPartnerId) {
+      const locDoc = await db.collection('delivery_locations').doc(order.deliveryPartnerId).get();
+      if (locDoc.exists) {
+        liveLocation = locDoc.data();
+      }
+    }
+
+    res.json({ order, liveLocation });
   } catch (error) {
     console.error('Get order error:', error);
     res.status(500).json({ error: error.message });
   }
 });
+
 
 // Update order status
 router.put('/:id/status', [

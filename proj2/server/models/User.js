@@ -139,6 +139,22 @@ class User {
     }
   }
 
+  // Update last known location timestamp or arbitrary small fields
+  async updateMeta(meta = {}) {
+    try {
+      const userRef = db.collection('users').doc(this.id);
+      const payload = {
+        ...meta,
+        updatedAt: new Date()
+      };
+      await userRef.update(payload);
+      Object.assign(this, payload);
+      return this;
+    } catch (error) {
+      throw new Error(`Failed to update user meta: ${error.message}`);
+    }
+  }
+
   // Convert to JSON
   toJSON() {
     return {

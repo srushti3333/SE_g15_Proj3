@@ -3,6 +3,8 @@ const { body, validationResult } = require('express-validator');
 const { db } = require('../config/firebase');
 const User = require('../models/User');
 const { awardPointsForOrder } = require('./points');
+const DeliveryLocation = require('../models/deliveryLocation'); // adjust path if needed
+
 
 const router = express.Router();
 
@@ -285,5 +287,88 @@ router.get('/available', async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+/* -------------------- Location endpoints -------------------- */
+
+/**
+ * Rider updates current location for a particular order.
+ * POST /delivery/update-location
+ * body: { riderId, orderId, lat, lng }
+ */
+router.post('/update-location', [
+  body('riderId').notEmpty(),
+  body('orderId').notEmpty(),
+  body('lat').isFloat(),
+  body('lng').isFloat()
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { riderId, orderId, lat, lng } = req.body;
+
+    // Optional: verify rider exists
+    const rider = await User.findById(riderId);
+    if (!rider) {
+      return res.status(404).json({ error: 'Rider not found' });
+    }
+
+    // Optional: verify this rider is assigned to this order
+    const orderDoc = await db.collection('orders').doc(orderId).get();
+    if (!orderDoc.exists) {
+      return res.status(404).json({ error: 'Order not found' });
+    }
+    const orderData = orderDoc.data();
+    if (orderData.deliveryPartnerId && orderData.deliveryPartnerId !== riderId) {
+      // Not assigned rider — still allow update if you want, or block
+      console.warn(`Rider ${riderId} updating location for order ${orderId} but not assigned.`);
+      // We choose to still accept location updates (helps riders share live location even if not assigned),
+      // but you can block by returning 403 if desired.
+    }
+
+    // Save to delivery_locations collection via model helper
+    await DeliveryLocation.setLocation({ riderId, orderId, lat, lng });
+
+    // Optionally update rider status timestamp
+    await rider.update({ lastLocationUpdateAt: new Date() });
+
+    res.json({ message: 'Location updated' });
+  } catch (error) {
+    console.error('Location update error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * Customer (or any client) can fetch latest rider location by orderId.
+ * GET /delivery/track/:orderId
+ * returns { riderId, location: {lat,lng,updatedAt} } or error if no rider assigned / no location
+ */
+router.get('/track/:orderId', async (req, res) => {
+  try {
+    const { orderId } = req.params;
+
+    const orderDoc = await db.collection('orders').doc(orderId).get();
+    if (!orderDoc.exists) return res.status(404).json({ error: 'Order not found' });
+
+    const orderData = orderDoc.data();
+    if (!orderData.deliveryPartnerId) {
+      return res.status(400).json({ error: 'No rider assigned yet' });
+    }
+
+    const location = await DeliveryLocation.getLocationByRiderId(orderData.deliveryPartnerId);
+
+    res.json({
+      riderId: orderData.deliveryPartnerId,
+      location // null if rider hasn't sent location yet
+    });
+  } catch (error) {
+    console.error('Track order error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 
 module.exports = router;

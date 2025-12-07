@@ -1,8 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../../contexts/AuthContext';
 import { api } from '../../services/api';
 import './Orders.css';
+// In the main App.tsx or Orders.tsx
+import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+// --- Tracking Hook ---
+import { useRef } from 'react';
+
+// Fix Leaflet default icon issue in TypeScript
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
+  iconUrl: require('leaflet/dist/images/marker-icon.png'),
+  shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
+});
+
 
 const Orders: React.FC = () => {
   const { user } = useAuth();
@@ -12,6 +28,81 @@ const Orders: React.FC = () => {
   const [ratingOrder, setRatingOrder] = useState<any>(null);
   const [rating, setRating] = useState(5);
   const [review, setReview] = useState('');
+
+  // Add state for live delivery tracking
+  const [trackingOrder, setTrackingOrder] = useState<any>(null);
+  const [deliveryLocation, setDeliveryLocation] = useState<[number, number] | null>(null);
+  const trackingInterval = useRef<NodeJS.Timer | null>(null);
+  const mapRef = useRef<L.Map | null>(null);
+
+  const [customerLocation, setCustomerLocation] = useState<[number, number] | null>(null);
+
+  // Get customer location on component mount
+  useEffect(() => {
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setCustomerLocation([position.coords.latitude, position.coords.longitude]);
+        },
+        (error) => console.error("Geolocation error:", error),
+        { enableHighAccuracy: true }
+      );
+    }
+  }, []);
+
+
+  // Polling the backend for live location every 5s if trackingOrder is set
+  useEffect(() => {
+    const fetchLocation = async () => {
+      if (!trackingOrder) return;
+      try {
+        const res = await api.get(`/delivery/track/${trackingOrder.id}`);
+        if (res.data?.location) {
+          setDeliveryLocation([res.data.location.lat, res.data.location.lng]);
+        } else {
+          setDeliveryLocation(null); // rider hasn't sent location yet
+        }
+      } catch (err: any) {
+        if (err.response?.status === 404) {
+          console.log('Order not found.');
+          setDeliveryLocation(null);
+        } else if (err.response?.status === 400) {
+          console.log('No rider assigned yet.');
+          setDeliveryLocation(null);
+        } else {
+          console.error('Failed to fetch delivery location', err);
+        }
+      }
+    };
+
+    if (trackingOrder) {
+      // Clear any previous interval
+      if (trackingInterval.current) clearInterval(trackingInterval.current);
+
+      fetchLocation(); // fetch immediately
+      trackingInterval.current = setInterval(fetchLocation, 5000);
+    }
+
+    // Cleanup
+    return () => {
+      if (trackingInterval.current) {
+        clearInterval(trackingInterval.current);
+        trackingInterval.current = null;
+      }
+    };
+  }, [trackingOrder]);
+
+  useEffect(() => {
+    if (mapRef.current && trackingOrder && deliveryLocation &&
+        trackingOrder.restaurantAddress?.lat && trackingOrder.deliveryAddress?.lat) {
+      const bounds = L.latLngBounds([
+        [trackingOrder.restaurantAddress.lat, trackingOrder.restaurantAddress.lng],
+        deliveryLocation,
+        [trackingOrder.deliveryAddress.lat, trackingOrder.deliveryAddress.lng],
+      ]);
+      mapRef.current.fitBounds(bounds, { padding: [50, 50] });
+    }
+  }, [trackingOrder, deliveryLocation]);
   
   const { data: orders, isLoading } = useQuery({
     queryKey: ['customerOrders', user?.id],
@@ -146,7 +237,16 @@ const Orders: React.FC = () => {
                   >
                     View Details
                   </button>
+                  {['out_for_delivery'].includes(order.status) && (
+                    <button 
+                    className="btn btn-info"
+                    onClick={() => setTrackingOrder(order)}
+                    >
+                      Track Order
+                    </button>
+                  )}
                 </div>
+
               </div>
             ))}
           </div>
@@ -280,6 +380,73 @@ const Orders: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Tracking Modal */}
+      {trackingOrder && (
+        <div className="modal-overlay" onClick={() => setTrackingOrder(null)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Tracking Order #{trackingOrder.id.slice(-6)}</h2>
+              <button className="close-btn" onClick={() => setTrackingOrder(null)}>×</button>
+            </div>
+            <div className="modal-body">
+              {deliveryLocation ? (
+                <MapContainer
+                  center={deliveryLocation}
+                  zoom={13}
+                  style={{ height: '400px', width: '100%' }}
+                  ref={mapRef}
+                >
+                  <TileLayer
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    attribution="&copy; OpenStreetMap contributors"
+                  />
+
+                  {/* Rider Current Location */}
+                  <Marker position={deliveryLocation}>
+                    <Popup>Rider Current Location</Popup>
+                  </Marker>
+
+                  {/* Restaurant Location */}
+                  {trackingOrder?.restaurantAddress?.lat && (
+                    <Marker position={[trackingOrder.restaurantAddress.lat, trackingOrder.restaurantAddress.lng]}>
+                      <Popup>Restaurant</Popup>
+                    </Marker>
+                  )}
+
+                  {/* Customer Delivery Address */}
+                  {/* {trackingOrder?.deliveryAddress?.lat && (
+                    <Marker position={[trackingOrder.deliveryAddress.lat, trackingOrder.deliveryAddress.lng]}>
+                      <Popup>Your Location</Popup>
+                    </Marker>
+                  )} */}
+                  {/* Customer Location (from browser) */}
+                  {customerLocation && (
+                    <Marker position={customerLocation}>
+                      <Popup>Your Location</Popup>
+                    </Marker>
+                  )}
+
+
+                  {/* Optional: Polyline from rider to customer */}
+                  {deliveryLocation && customerLocation && (
+                    <Polyline
+                      positions={[deliveryLocation, customerLocation]}
+                      color="blue"
+                    />
+                  )}
+
+                </MapContainer>
+              ) : (
+                <p>Loading delivery location...</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+
+
 
       {/* Rating Modal */}
       {showRatingModal && ratingOrder && (
