@@ -510,18 +510,6 @@ This project is licensed under the MIT License - see the [LICENSE.md](docs/LICEN
 
 ---
 
-## 👨‍💻 Team
-
-**Group 15 - Fall 2025**
-
-- Team Member 1 - [GitHub](https://github.com/member1)
-- Team Member 2 - [GitHub](https://github.com/member2)
-- Team Member 3 - [GitHub](https://github.com/member3)
-- Team Member 4 - [GitHub](https://github.com/member4)
-- Team Member 5 - [GitHub](https://github.com/member5)
-
----
-
 ## 🙏 Acknowledgments
 
 - Original Hungry Wolf project team for the foundation
