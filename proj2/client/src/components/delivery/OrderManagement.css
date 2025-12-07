@@ -197,3 +197,15 @@
     width: 100%;
   }
 }
+
+.tracking-banner {
+  background-color: #e0f7fa;
+  color: #00796b;
+  padding: 10px 15px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}

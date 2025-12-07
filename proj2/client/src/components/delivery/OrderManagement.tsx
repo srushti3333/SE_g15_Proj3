@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../../contexts/AuthContext';
 import { api } from '../../services/api';
 import './OrderManagement.css';
+
 
 interface Order {
   id: string;
@@ -27,6 +28,8 @@ interface Order {
 const OrderManagement: React.FC = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const [watchId, setWatchId] = useState<number | null>(null);
+
 
   // Get assigned orders for this rider
   const { data: assignedOrders = [] } = useQuery<Order[]>({
@@ -52,6 +55,17 @@ const OrderManagement: React.FC = () => {
     refetchInterval: 10000, // Refetch every 10 seconds
     refetchOnWindowFocus: true
   });
+
+  const readyOrders = assignedOrders.filter(order => order.status === 'ready');
+  const outForDeliveryOrders = assignedOrders.filter(order => order.status === 'out_for_delivery');
+  const completedOrders = assignedOrders.filter(order => order.status === 'delivered');
+  
+  // Check if rider has any active orders (ready or out_for_delivery)
+  const hasActiveOrders = assignedOrders.some(order => 
+    ['ready', 'out_for_delivery'].includes(order.status)
+  );
+
+  const isTracking = watchId !== null && outForDeliveryOrders.length > 0;
 
   // Accept order mutation
   const acceptOrderMutation = useMutation({
@@ -141,12 +155,57 @@ const OrderManagement: React.FC = () => {
   };
 
   const handlePickupOrder = (orderId: string) => {
-    pickupOrderMutation.mutate(orderId);
+    pickupOrderMutation.mutate(orderId, {
+      onSuccess: () => {
+        if (!watchId && 'geolocation' in navigator) {
+          const sendLocation = async () => {
+            navigator.geolocation.getCurrentPosition(
+              async (position) => {
+                const { latitude, longitude } = position.coords;
+                try {
+                  await api.post('/delivery/update-location', {
+                    riderId: user?.id,
+                    orderId,
+                    lat: latitude,
+                    lng: longitude,
+                    timestamp: new Date().toISOString(),
+                  });
+                } catch (err: any) {
+                  console.error('Error updating location:', err?.response?.data || err);
+                }
+              },
+              (error) => console.error('Geolocation error:', error),
+              { enableHighAccuracy: true, maximumAge: 5000, timeout: 10000 }
+            );
+          };
+
+          // Immediate update
+          sendLocation();
+
+          // Then every 5 seconds
+          const intervalId = setInterval(sendLocation, 5000);
+          setWatchId(intervalId as unknown as number);
+        }
+      },
+      onError: (err: any) => {
+        console.error('Pickup order error:', err?.response?.data || err);
+        alert(err?.response?.data?.error || 'Failed to pickup order');
+      }
+    });
   };
 
   const handleDeliverOrder = (orderId: string) => {
-    deliverOrderMutation.mutate(orderId);
+    deliverOrderMutation.mutate(orderId, {
+      onSuccess: () => {
+        // Clear GPS tracking after delivery
+        if (watchId !== null) {
+          navigator.geolocation.clearWatch(watchId);
+          setWatchId(null);
+        }
+      }
+    });
   };
+
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -157,18 +216,57 @@ const OrderManagement: React.FC = () => {
     }
   };
 
-  const readyOrders = assignedOrders.filter(order => order.status === 'ready');
-  const outForDeliveryOrders = assignedOrders.filter(order => order.status === 'out_for_delivery');
-  const completedOrders = assignedOrders.filter(order => order.status === 'delivered');
-  
-  // Check if rider has any active orders (ready or out_for_delivery)
-  const hasActiveOrders = assignedOrders.some(order => 
-    ['ready', 'out_for_delivery'].includes(order.status)
-  );
+  useEffect(() => {
+    if (!('geolocation' in navigator)) return;
+
+    const activeOrder = outForDeliveryOrders[0];
+    if (!activeOrder) return;
+
+    let intervalId: NodeJS.Timer;
+
+    const sendLocation = async () => {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+          try {
+            await api.post('/delivery/update-location', {
+              riderId: user?.id,
+              orderId: activeOrder.id,
+              lat: latitude,
+              lng: longitude,
+              timestamp: new Date().toISOString(),
+            });
+          } catch (err: any) {
+            console.error('Error sending location update:', err?.response?.data || err);
+          }
+        },
+        (error) => console.error('Geolocation error:', error),
+        { enableHighAccuracy: true, maximumAge: 5000, timeout: 10000 }
+      );
+    };
+
+    // Send immediately
+    sendLocation();
+
+    // Send every 5 seconds
+    intervalId = setInterval(sendLocation, 5000);
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [outForDeliveryOrders[0]?.id, user?.id]);
+
+
 
   return (
     <div className="delivery-order-management">
       <h1>Order Management</h1>
+      {isTracking && (
+        <div className="tracking-banner">
+          🚚 Location tracking is active for your delivery.
+        </div>
+      )}
+
       <p>Manage your delivery assignments and track order progress.</p>
 
       {/* Available Orders - Can Accept */}

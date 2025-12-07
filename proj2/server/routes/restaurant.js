@@ -4,6 +4,8 @@ const User = require('../models/User');
 const Restaurant = require('../models/Restaurant');
 
 const router = express.Router();
+const geofire = require("geofire-common");
+
 
 // Get restaurant profile (simplified - no auth required for now)
 router.get('/profile', async (req, res) => {
@@ -178,5 +180,76 @@ router.post('/create', [
     res.status(500).json({ error: error.message });
   }
 });
+
+// Get restaurants near user location
+router.get('/nearby', async (req, res) => {
+  try {
+    const { lat, lng, radius } = req.query;
+
+    // Validate required params
+    if (!lat || !lng) {
+      return res.status(400).json({ error: 'lat and lng are required' });
+    }
+
+    const center = [parseFloat(lat), parseFloat(lng)];
+
+    // Parse radius from query, fallback to 5000m
+    let radiusInM = 5000;
+    if (radius) {
+      const r = parseInt(radius, 10);
+      if (!isNaN(r) && r > 0) radiusInM = r;
+    }
+
+    const bounds = geofire.geohashQueryBounds(center, radiusInM);
+    const promises = [];
+
+    const { db } = require('../config/firebase');
+
+    bounds.forEach(b => {
+      const q = db.collection('restaurants')
+        .orderBy('geohash')
+        .startAt(b[0])
+        .endAt(b[1]);
+
+      promises.push(q.get());
+    });
+
+    const snapshots = await Promise.all(promises);
+
+    let matching = [];
+
+    snapshots.forEach(snap => {
+      snap.forEach(doc => {
+        const data = doc.data();
+        if (!data.location) return;
+
+        const distance = geofire.distanceBetween(
+          [data.location.lat, data.location.lng],
+          center
+        ) * 1000;
+
+        if (distance <= radiusInM) {
+          matching.push({
+            ...data,
+            distance
+          });
+        }
+      });
+    });
+
+    // Sort by distance ascending
+    matching.sort((a, b) => a.distance - b.distance);
+
+    res.json({
+      count: matching.length,
+      restaurants: matching
+    });
+
+  } catch (error) {
+    console.error('Nearby restaurants error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 
 module.exports = router;

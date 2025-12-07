@@ -1,4 +1,6 @@
 const { db } = require('../config/firebase');
+// near other static methods
+const DeliveryLocation = require('./deliveryLocation');
 
 class Order {
   constructor(data) {
@@ -144,63 +146,43 @@ class Order {
     }
   }
 
-  // // Add rating
-  // async addRating(raterRole, ratingData) {
-  //   try {
-  //     const orderRef = db.collection('orders').doc(this.id);
-  //     const currentRatings = this.ratings || {};
-
-  //     // if (!currentRatings[raterRole]) {
-  //     //   currentRatings[raterRole] = {};
-  //     // }
-
-  //     // currentRatings[raterRole] = { ...currentRatings[raterRole], ...ratingData };
-  //     currentRatings[raterRole] = {
-  //       rating: ratingData.rating,
-  //       review: ratingData.review || null,
-  //       ratedAt: new Date()
-  //     };
-
-  //     await orderRef.update({
-  //       ratings: currentRatings,
-  //       updatedAt: new Date()
-  //     });
-
-  //     this.ratings = currentRatings;
-  //     this.updatedAt = new Date();
-
-  //     return this;
-  //   } catch (error) {
-  //     throw new Error(`Failed to add rating: ${error.message}`);
-  //   }
-  // }
-
+ 
   // Add rating
-async addRating(raterRole, ratingData) {
-  try {
-    const orderRef = db.collection('orders').doc(this.id);
-    const currentRatings = this.ratings || {};
+  async addRating(raterRole, ratingData) {
+    try {
+      const orderRef = db.collection('orders').doc(this.id);
+      const currentRatings = this.ratings || {};
 
-    currentRatings[raterRole] = {
-      rating: ratingData.rating,
-      review: ratingData.review || null,
-      ratedAt: new Date()
-    };
+      currentRatings[raterRole] = {
+        rating: ratingData.rating,
+        review: ratingData.review || null,
+        ratedAt: new Date()
+      };
 
-    await orderRef.update({
-      ratings: currentRatings,
-      updatedAt: new Date()
-    });
+      await orderRef.update({
+        ratings: currentRatings,
+        updatedAt: new Date()
+      });
 
-    this.ratings = currentRatings;
-    this.updatedAt = new Date();
+      this.ratings = currentRatings;
+      this.updatedAt = new Date();
 
-    return this;
-  } catch (error) {
-    throw new Error(`Failed to add rating: ${error.message}`);
+      return this;
+    } catch (error) {
+      throw new Error(`Failed to add rating: ${error.message}`);
+    }
   }
-}
 
+    // Get delivery partner's latest location for this order
+  async getDeliveryPartnerLocation() {
+    try {
+      if (!this.deliveryPartnerId) return null;
+      const loc = await DeliveryLocation.getLocationByRiderId(this.deliveryPartnerId);
+      return loc;
+    } catch (err) {
+      throw new Error(`Failed to get partner location: ${err.message}`);
+    }
+  }
 
   // Get pending orders for restaurant
   static async getPendingOrders() {
