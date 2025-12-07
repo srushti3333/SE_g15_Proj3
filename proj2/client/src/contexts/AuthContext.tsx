@@ -18,6 +18,7 @@ interface AuthContextType {
   register: (userData: any) => Promise<void>;
   logout: () => void;
   getProfile: (email: string, password: string) => Promise<User>;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -113,7 +114,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     login,
     register,
     logout,
-    getProfile
+    getProfile,
+    setUser
   };
 
   return (
