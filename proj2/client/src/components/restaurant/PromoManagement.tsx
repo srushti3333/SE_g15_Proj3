@@ -54,6 +54,7 @@ const PromoManagement: React.FC = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['restaurantPromos', user?.id] });
+      queryClient.invalidateQueries({ queryKey: ['activePromos'] });
       setIsCreating(false);
       resetForm();
       alert('Promo created successfully! 🎉');
@@ -71,6 +72,7 @@ const PromoManagement: React.FC = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['restaurantPromos', user?.id] });
+      queryClient.invalidateQueries({ queryKey: ['activePromos'] });
       alert('Promo deactivated successfully!');
     }
   });
@@ -83,6 +85,7 @@ const PromoManagement: React.FC = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['restaurantPromos', user?.id] });
+      queryClient.invalidateQueries({ queryKey: ['activePromos'] });
       alert('Promo deleted successfully!');
     }
   });

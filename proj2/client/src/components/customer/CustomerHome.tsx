@@ -247,6 +247,7 @@ import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '../../contexts/AuthContext';
 import { api } from '../../services/api';
+import { promoApi } from '../../services/promo-api';
 import './CustomerHome.css';
 
 const CustomerHome: React.FC = () => {
@@ -280,6 +281,20 @@ const CustomerHome: React.FC = () => {
     },
     enabled: !!user?.id, // Only fetch if user exists
     retry: 1,
+  });
+
+  const { data: promos } = useQuery({
+    queryKey: ['activePromos'],
+    queryFn: async () => {
+      try {
+        return await promoApi.getActivePromos();
+      } catch (error) {
+        console.error('Error fetching promos:', error);
+        return [];
+      }
+    },
+    retry: 1,
+    refetchInterval: 30000, // Refetch every 30 seconds
   });
 
   return (
@@ -321,6 +336,24 @@ const CustomerHome: React.FC = () => {
           <p>Manage your subscription</p>
         </Link>
       </div>
+
+      {promos && promos.length > 0 && (
+        <div className="promos-section">
+          <h2>🎉 Active Promotions</h2>
+          <div className="promos-grid">
+            {promos.map((promo: any) => (
+              <div key={promo.id} className="promo-card">
+                <div className="promo-badge">{promo.discountPercent}% OFF</div>
+                <h3>{promo.title}</h3>
+                <p className="promo-restaurant">{promo.restaurantName}</p>
+                <p className="promo-description">{promo.description}</p>
+                <div className="promo-code">Code: <strong>{promo.code}</strong></div>
+                <p className="promo-validity">Valid until {new Date(promo.validUntil).toLocaleDateString()}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="featured-restaurants">
         <h2>Featured Restaurants</h2>

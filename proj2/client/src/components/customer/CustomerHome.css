@@ -42,15 +42,87 @@
 }
 
 .featured-restaurants,
-.recent-orders {
+.recent-orders,
+.promos-section {
   margin-bottom: 40px;
 }
 
 .featured-restaurants h2,
-.recent-orders h2 {
+.recent-orders h2,
+.promos-section h2 {
   font-size: 1.8rem;
   margin-bottom: 20px;
   color: #333;
+}
+
+.promos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.promo-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+}
+
+.promo-card:hover {
+  transform: translateY(-5px);
+}
+
+.promo-badge {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: #ffd700;
+  color: #333;
+  padding: 8px 12px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.promo-card h3 {
+  margin: 0 0 10px 0;
+  font-size: 1.4rem;
+}
+
+.promo-restaurant {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.promo-description {
+  margin-bottom: 15px;
+  line-height: 1.5;
+}
+
+.promo-code {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.promo-code strong {
+  font-size: 1.2rem;
+  letter-spacing: 2px;
+}
+
+.promo-validity {
+  font-size: 0.85rem;
+  opacity: 0.8;
+  margin: 0;
+  text-align: center;
 }
 
 .restaurants-grid {
