@@ -7,7 +7,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](docs/LICENSE.md)
 [![GitHub issues](https://img.shields.io/github/issues/srushti3333/SE_g15_Proj3)](https://github.com/srushti3333/SE_g15_Proj3/issues)
 [![GitHub closed issues](https://img.shields.io/github/issues-closed/srushti3333/SE_g15_Proj3)](https://github.com/srushti3333/SE_g15_Proj3/issues?q=is%3Aissue+is%3Aclosed)
-![Tests](https://img.shields.io/badge/tests-234_passing-success)
+![Tests](https://img.shields.io/badge/tests-267_passing-success)
 [![Contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)](docs/CONTRIBUTING.md)
 
 ---
@@ -205,13 +205,13 @@ Discover nearby restaurants with geolocation and distance sorting
 ### Frontend
 ![React](https://img.shields.io/badge/React-19.2.0-61DAFB?logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-4.9.5-3178C6?logo=typescript)
-![React Query](https://img.shields.io/badge/React_Query-5.90.5-FF4154?logo=react-query)
-![React Router](https://img.shields.io/badge/React_Router-7.9.4-CA4245?logo=react-router)
+![React Query](https://img.shields.io/badge/React_Query-5.90.12-FF4154?logo=react-query)
+![React Router](https://img.shields.io/badge/React_Router-6.30.2-CA4245?logo=react-router)
 
 ### Backend
-![Node.js](https://img.shields.io/badge/Node.js-22.x-339933?logo=node.js)
+![Node.js](https://img.shields.io/badge/Node.js-22.21.1-339933?logo=node.js)
 ![Express](https://img.shields.io/badge/Express-4.18.2-000000?logo=express)
-![Firebase](https://img.shields.io/badge/Firebase-11.10.1-FFCA28?logo=firebase)
+![Firebase Admin](https://img.shields.io/badge/Firebase_Admin-11.11.1-FFCA28?logo=firebase)
 
 ### Testing & Quality
 ![Jest](https://img.shields.io/badge/Jest-29.6.2-C21325?logo=jest)
@@ -303,21 +303,18 @@ For detailed installation instructions, see [INSTALL.md](docs/INSTALL.md)
 
 ## 🧪 Testing
 
-We have **234 comprehensive test cases** with 70-80% code coverage across all features!
+We have **267 comprehensive test cases** with 91% code coverage on business logic!
 
 ### Run All Tests
 ```bash
-# All tests from project root (234 tests)
+# All tests from project root (267 tests)
 npm test
 
-# Backend tests only (47 tests)
+# Backend tests only (5 tests)
 cd server && npm test
 
-# Frontend tests only (1 test)
-cd client && npm test
-
-# Business logic tests (186 tests)
-cd proj2 && npm test
+# Business logic tests (262 tests - includes quest system)
+npm test
 
 # With coverage report
 npm test -- --coverage
@@ -325,13 +322,11 @@ npm test -- --coverage
 
 ### Test Breakdown by Category
 
-#### 🔧 Backend API Tests (47 tests)
-- **Promos API**: 11 tests (CRUD operations, validation)
-- **Wishlist API**: 9 tests (add/remove items, clear)
-- **Subscriptions API**: 17 tests (plans, meal updates, toggle)
-- **Ratings API**: 10 tests (reviews, stats, recalculation)
+#### 🔧 Backend API Tests (5 tests)
+- **Order Routes**: 3 tests (order creation, status updates)
+- **Delivery Location**: 2 tests (location tracking)
 
-#### 🎯 Business Logic Tests (186 tests)
+#### 🎯 Business Logic Tests (262 tests)
 - **Core Business Logic**: 130 tests
   - Points System: 28 tests
   - Order Management: 25 tests
@@ -339,16 +334,18 @@ npm test -- --coverage
   - Restaurant Features: 15 tests
   - Rating System: 10 tests
   - Edge Cases: 32 tests
-- **Quest System**: 56 tests
+- **Quest System**: 132 tests
   - Quest Progress: 20 tests
   - Weekend Detection: 15 tests
   - Quest Completion: 15 tests
-  - Reward Validation: 6 tests
+  - Reward Validation: 15 tests
+  - Quest Logic Functions: 15 tests
+  - Cuisine Tracking: 15 tests
+  - Quest Type Validation: 15 tests
+  - Edge Cases: 15 tests
+  - Model Validation: 7 tests
 
-#### ⚛️ Frontend Tests (1 test)
-- **App Component**: 1 smoke test
-
-**Total: 234 Tests** | **Coverage: 70-80%** | **All Passing ✅**
+**Total: 267 Tests** | **Coverage: 91% (business logic)** | **All Passing ✅**
 
 For detailed testing guide, see [TESTING.md](TESTING.md)
 
@@ -472,9 +469,9 @@ We welcome contributions! This project is designed to be extended by future team
 ## 📊 Project Statistics
 
 - **Total Commits**: 200+
-- **Contributors**: 4 active developers
-- **Test Cases**: 234 automated tests (all passing ✅)
-- **Code Coverage**: 70-80% (91% on business logic)
+- **Contributors**: 5 active developers
+- **Test Cases**: 267 automated tests (all passing ✅)
+- **Code Coverage**: 91% (business logic)
 - **Issues Closed**: 25+
 - **Pull Requests**: 40+ merged
 - **Lines of Code**: 15,000+
@@ -521,18 +518,6 @@ This project is licensed under the MIT License - see the [LICENSE.md](docs/LICEN
 
 ---
 
-## 👨‍💻 Team
-
-**Group 15 - Fall 2025**
-
-- Team Member 1 - [GitHub](https://github.com/member1)
-- Team Member 2 - [GitHub](https://github.com/member2)
-- Team Member 3 - [GitHub](https://github.com/member3)
-- Team Member 4 - [GitHub](https://github.com/member4)
-- Team Member 5 - [GitHub](https://github.com/member5)
-
----
-
 ## 🙏 Acknowledgments
 
 - Original Hungry Wolf project team for the foundation
@@ -553,9 +538,9 @@ This project is licensed under the MIT License - see the [LICENSE.md](docs/LICEN
 ## 🌟 Why Choose Hungry Wolf for Project 3?
 
 1. **Well-Documented**: Comprehensive docs and inline comments
-2. **Thoroughly Tested**: 234 test cases with 70-80% coverage
+2. **Thoroughly Tested**: 267 test cases with 91% coverage on business logic
 3. **Modular Architecture**: Easy to extend with new features
-4. **Modern Tech Stack**: Latest React 19, Node.js 22, Firebase
+4. **Modern Tech Stack**: React 19, Node.js 22, Firebase Admin
 5. **Active Development**: Regular commits and updates
 6. **Clear Roadmap**: 4+ milestones ready for Project 3
 7. **Real-World Application**: Production-ready food delivery platform
