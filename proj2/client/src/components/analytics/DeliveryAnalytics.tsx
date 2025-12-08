@@ -49,7 +49,11 @@ const DeliveryAnalytics: React.FC = () => {
     try {
       const response = await fetch(`/api/analytics/delivery/${user?.id}?range=${timeRange}`);
       const result = await response.json();
-      setData(result);
+      if (result.totalDeliveries && result.totalDeliveries >= 10) {
+        setData(result);
+      } else {
+        setData(getMockDeliveryData());
+      }
     } catch (error) {
       console.error('Error fetching delivery analytics:', error);
       setData(getMockDeliveryData());

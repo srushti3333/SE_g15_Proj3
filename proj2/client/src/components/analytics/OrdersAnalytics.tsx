@@ -45,7 +45,11 @@ const OrdersAnalytics: React.FC<{ restaurantId?: string }> = ({ restaurantId }) 
     try {
       const response = await fetch(`/api/analytics/orders/restaurant/${restaurantId}?range=${timeRange}`);
       const result = await response.json();
-      setData(result);
+      if (result.totalOrders && result.totalOrders >= 10) {
+        setData(result);
+      } else {
+        setData(getMockOrdersData());
+      }
     } catch (error) {
       console.error('Error fetching orders analytics:', error);
       setData(getMockOrdersData());

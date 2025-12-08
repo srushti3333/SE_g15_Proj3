@@ -49,7 +49,11 @@ const CustomerAnalytics: React.FC = () => {
     try {
       const response = await fetch(`/api/analytics/customer/${user?.id}?range=${timeRange}`);
       const result = await response.json();
-      setData(result);
+      if (result.totalOrders && result.totalOrders >= 10) {
+        setData(result);
+      } else {
+        setData(getMockCustomerData());
+      }
     } catch (error) {
       console.error('Error fetching customer analytics:', error);
       setData(getMockCustomerData());

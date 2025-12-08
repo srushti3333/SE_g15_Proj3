@@ -49,7 +49,11 @@ const DonationAnalytics: React.FC<{ restaurantId?: string }> = ({ restaurantId }
     try {
       const response = await fetch(`/api/analytics/donations/restaurant/${restaurantId}?range=${timeRange}`);
       const result = await response.json();
-      setData(result);
+      if (result.totalMealsDonated && result.totalMealsDonated >= 10) {
+        setData(result);
+      } else {
+        setData(getMockDonationData());
+      }
     } catch (error) {
       console.error('Error fetching donation analytics:', error);
       setData(getMockDonationData());

@@ -50,10 +50,13 @@ const RestaurantAnalytics: React.FC = () => {
   const fetchRestaurantData = async () => {
     setLoading(true);
     try {
-      // API Endpoint: GET /api/analytics/restaurant/{restaurantId}?range={timeRange}
       const response = await fetch(`/api/analytics/restaurant/${user?.id}?range=${timeRange}`);
       const result = await response.json();
-      setData(result);
+      if (result.totalOrders && result.totalOrders >= 10) {
+        setData(result);
+      } else {
+        setData(getMockRestaurantData());
+      }
     } catch (error) {
       console.error('Error fetching restaurant analytics:', error);
       setData(getMockRestaurantData());
