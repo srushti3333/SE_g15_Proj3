@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { subscriptionApi, SubscriptionPreferences } from '../../services/subscription-api';
-import { promoApi, Promo } from '../../services/promo-api';
-import './Subscription.css';
+import React, { useState } from "react";
+import { useAuth } from "../../contexts/AuthContext";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  subscriptionApi,
+  SubscriptionPreferences,
+} from "../../services/subscription-api";
+import { promoApi, Promo } from "../../services/promo-api";
+import "./Subscription.css";
 
 const Subscription: React.FC = () => {
   const { user } = useAuth();
@@ -11,70 +14,73 @@ const Subscription: React.FC = () => {
   const [isCreating, setIsCreating] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [showPromos, setShowPromos] = useState(true);
-  
+
   // Form state
-  const [planType, setPlanType] = useState<'weekly' | 'biweekly' | 'monthly'>('weekly');
+  const [planType, setPlanType] = useState<"weekly" | "biweekly" | "monthly">(
+    "weekly"
+  );
   const [cuisines, setCuisines] = useState<string[]>([]);
   const [dietaryRestrictions, setDietaryRestrictions] = useState<string[]>([]);
-  const [budget, setBudget] = useState('');
+  const [budget, setBudget] = useState("");
   const [promoAlerts, setPromoAlerts] = useState(true);
 
   // Fetch subscription
   const { data: subscription, isLoading: subLoading } = useQuery({
-    queryKey: ['subscription', user?.id],
+    queryKey: ["subscription", user?.id],
     queryFn: () => subscriptionApi.getSubscription(user!.id),
-    enabled: !!user?.id
+    enabled: !!user?.id,
   });
 
   // Fetch personalized promos
   const { data: promos = [], isLoading: promosLoading } = useQuery({
-    queryKey: ['promos', user?.id],
+    queryKey: ["promos", user?.id],
     queryFn: () => promoApi.getCustomerPromos(user!.id),
-    enabled: !!user?.id && showPromos
+    enabled: !!user?.id && showPromos,
   });
 
   // Create subscription mutation
   const createMutation = useMutation({
     mutationFn: (data: any) => subscriptionApi.createSubscription(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['subscription', user?.id] });
+      queryClient.invalidateQueries({ queryKey: ["subscription", user?.id] });
       setIsCreating(false);
       resetForm();
-    }
+    },
   });
 
   // Update subscription mutation
   const updateMutation = useMutation({
-    mutationFn: (data: any) => subscriptionApi.updateSubscription(user!.id, data),
+    mutationFn: (data: any) =>
+      subscriptionApi.updateSubscription(user!.id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['subscription', user?.id] });
+      queryClient.invalidateQueries({ queryKey: ["subscription", user?.id] });
       setIsEditing(false);
-      alert('Subscription updated successfully! ✓');
-    }
+      alert("Subscription updated successfully! ✓");
+    },
   });
 
   // Toggle subscription mutation
   const toggleMutation = useMutation({
     mutationFn: () => subscriptionApi.toggleSubscription(user!.id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['subscription', user?.id] });
-    }
+      queryClient.invalidateQueries({ queryKey: ["subscription", user?.id] });
+    },
   });
 
   // Delete subscription mutation
   const deleteMutation = useMutation({
     mutationFn: () => subscriptionApi.deleteSubscription(user!.id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['subscription', user?.id] });
-      alert('Subscription cancelled successfully!');
-    }
+      queryClient.invalidateQueries({ queryKey: ["subscription", user?.id] });
+      alert("Subscription cancelled successfully!");
+    },
   });
 
   const resetForm = () => {
-    setPlanType('weekly');
+    setPlanType("weekly");
     setCuisines([]);
     setDietaryRestrictions([]);
-    setBudget('');
+    setBudget("");
     setPromoAlerts(true);
   };
 
@@ -86,24 +92,24 @@ const Subscription: React.FC = () => {
       preferences: {
         cuisines,
         dietaryRestrictions,
-        budget
+        budget,
       },
-      promoAlerts
+      promoAlerts,
     });
   };
 
   const handleToggleCuisine = (cuisine: string) => {
-    setCuisines(prev => 
-      prev.includes(cuisine) 
-        ? prev.filter(c => c !== cuisine)
+    setCuisines((prev) =>
+      prev.includes(cuisine)
+        ? prev.filter((c) => c !== cuisine)
         : [...prev, cuisine]
     );
   };
 
   const handleToggleRestriction = (restriction: string) => {
-    setDietaryRestrictions(prev =>
+    setDietaryRestrictions((prev) =>
       prev.includes(restriction)
-        ? prev.filter(r => r !== restriction)
+        ? prev.filter((r) => r !== restriction)
         : [...prev, restriction]
     );
   };
@@ -113,8 +119,10 @@ const Subscription: React.FC = () => {
       // Pre-fill form with existing subscription data
       setPlanType(subscription.planType);
       setCuisines(subscription.preferences?.cuisines || []);
-      setDietaryRestrictions(subscription.preferences?.dietaryRestrictions || []);
-      setBudget(subscription.preferences?.budget || '');
+      setDietaryRestrictions(
+        subscription.preferences?.dietaryRestrictions || []
+      );
+      setBudget(subscription.preferences?.budget || "");
       setPromoAlerts(subscription.promoAlerts);
       setIsEditing(true);
     }
@@ -127,21 +135,42 @@ const Subscription: React.FC = () => {
       preferences: {
         cuisines,
         dietaryRestrictions,
-        budget
+        budget,
       },
-      promoAlerts
+      promoAlerts,
     });
   };
 
   const handleDeleteSubscription = () => {
-    if (window.confirm('Are you sure you want to cancel your subscription? This action cannot be undone.')) {
+    if (
+      window.confirm(
+        "Are you sure you want to cancel your subscription? This action cannot be undone."
+      )
+    ) {
       deleteMutation.mutate();
     }
   };
 
-  const cuisineOptions = ['Italian', 'Chinese', 'Mexican', 'Indian', 'Japanese', 'American', 'Thai', 'Mediterranean'];
-  const restrictionOptions = ['Vegetarian', 'Vegan', 'Gluten-Free', 'Dairy-Free', 'Nut-Free', 'Halal', 'Kosher'];
-  const budgetOptions = ['$', '$$', '$$$', '$$$$'];
+  const cuisineOptions = [
+    "Italian",
+    "Chinese",
+    "Mexican",
+    "Indian",
+    "Japanese",
+    "American",
+    "Thai",
+    "Mediterranean",
+  ];
+  const restrictionOptions = [
+    "Vegetarian",
+    "Vegan",
+    "Gluten-Free",
+    "Dairy-Free",
+    "Nut-Free",
+    "Halal",
+    "Kosher",
+  ];
+  const budgetOptions = ["$", "$$", "$$$", "$$$$"];
 
   if (subLoading) {
     return (
@@ -155,21 +184,23 @@ const Subscription: React.FC = () => {
     <div className="subscription-container">
       <div className="subscription-header">
         <h2>🗓️ Meal Plan Subscription</h2>
-        <p className="subscription-subtitle">Weekly meal plans delivered to your door</p>
+        <p className="subscription-subtitle">
+          Weekly meal plans delivered to your door
+        </p>
       </div>
 
       {/* Promo Alerts Section */}
       <div className="promo-alerts-section">
         <div className="section-header">
           <h3>🎉 Active Promotions & Deals</h3>
-          <button 
+          <button
             className="toggle-promos-btn"
             onClick={() => setShowPromos(!showPromos)}
           >
-            {showPromos ? 'Hide' : 'Show'} Promos
+            {showPromos ? "Hide" : "Show"} Promos
           </button>
         </div>
-        
+
         {showPromos && (
           <div className="promos-container">
             {promosLoading ? (
@@ -182,16 +213,21 @@ const Subscription: React.FC = () => {
               <div className="promos-grid">
                 {promos.map((promo: Promo) => (
                   <div key={promo.id} className="promo-card">
-                    <div className="promo-badge">{promo.discountPercent}% OFF</div>
+                    <div className="promo-badge">
+                      {promo.discountPercent}% OFF
+                    </div>
                     <h4>{promo.title}</h4>
-                    <p className="promo-restaurant">📍 {promo.restaurantName}</p>
+                    <p className="promo-restaurant">
+                      📍 {promo.restaurantName}
+                    </p>
                     <p className="promo-description">{promo.description}</p>
                     <div className="promo-code">
                       <span>Code:</span>
                       <strong>{promo.code}</strong>
                     </div>
                     <p className="promo-validity">
-                      Valid until: {new Date(promo.validUntil).toLocaleDateString()}
+                      Valid until:{" "}
+                      {new Date(promo.validUntil).toLocaleDateString()}
                     </p>
                   </div>
                 ))}
@@ -209,8 +245,11 @@ const Subscription: React.FC = () => {
               <div className="empty-state">
                 <div className="empty-icon">📦</div>
                 <h3>No Active Subscription</h3>
-                <p>Subscribe to a weekly meal plan and never worry about what to eat!</p>
-                <button 
+                <p>
+                  Subscribe to a weekly meal plan and never worry about what to
+                  eat!
+                </p>
+                <button
                   className="create-btn"
                   onClick={() => setIsCreating(true)}
                 >
@@ -222,19 +261,24 @@ const Subscription: React.FC = () => {
             <div className="create-subscription-form">
               <h3>Create Your Meal Plan</h3>
               <form onSubmit={handleCreateSubscription}>
-                
                 {/* Plan Type */}
                 <div className="form-group">
                   <label>Plan Type</label>
                   <div className="plan-options">
-                    {['weekly', 'biweekly', 'monthly'].map(type => (
+                    {["weekly", "biweekly", "monthly"].map((type) => (
                       <button
                         key={type}
                         type="button"
-                        className={`plan-option ${planType === type ? 'active' : ''}`}
+                        className={`plan-option ${
+                          planType === type ? "active" : ""
+                        }`}
                         onClick={() => setPlanType(type as any)}
                       >
-                        {type === 'weekly' ? '📅 Weekly' : type === 'biweekly' ? '📆 Bi-Weekly' : '🗓️ Monthly'}
+                        {type === "weekly"
+                          ? "📅 Weekly"
+                          : type === "biweekly"
+                          ? "📆 Bi-Weekly"
+                          : "🗓️ Monthly"}
                       </button>
                     ))}
                   </div>
@@ -244,11 +288,13 @@ const Subscription: React.FC = () => {
                 <div className="form-group">
                   <label>Preferred Cuisines</label>
                   <div className="options-grid">
-                    {cuisineOptions.map(cuisine => (
+                    {cuisineOptions.map((cuisine) => (
                       <button
                         key={cuisine}
                         type="button"
-                        className={`option-btn ${cuisines.includes(cuisine) ? 'selected' : ''}`}
+                        className={`option-btn ${
+                          cuisines.includes(cuisine) ? "selected" : ""
+                        }`}
                         onClick={() => handleToggleCuisine(cuisine)}
                       >
                         {cuisine}
@@ -261,11 +307,15 @@ const Subscription: React.FC = () => {
                 <div className="form-group">
                   <label>Dietary Restrictions</label>
                   <div className="options-grid">
-                    {restrictionOptions.map(restriction => (
+                    {restrictionOptions.map((restriction) => (
                       <button
                         key={restriction}
                         type="button"
-                        className={`option-btn ${dietaryRestrictions.includes(restriction) ? 'selected' : ''}`}
+                        className={`option-btn ${
+                          dietaryRestrictions.includes(restriction)
+                            ? "selected"
+                            : ""
+                        }`}
                         onClick={() => handleToggleRestriction(restriction)}
                       >
                         {restriction}
@@ -278,11 +328,11 @@ const Subscription: React.FC = () => {
                 <div className="form-group">
                   <label>Budget per Meal</label>
                   <div className="budget-options">
-                    {budgetOptions.map(b => (
+                    {budgetOptions.map((b) => (
                       <button
                         key={b}
                         type="button"
-                        className={`budget-btn ${budget === b ? 'active' : ''}`}
+                        className={`budget-btn ${budget === b ? "active" : ""}`}
                         onClick={() => setBudget(b)}
                       >
                         {b}
@@ -304,8 +354,8 @@ const Subscription: React.FC = () => {
                 </div>
 
                 <div className="form-actions">
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     className="cancel-btn"
                     onClick={() => {
                       setIsCreating(false);
@@ -314,12 +364,14 @@ const Subscription: React.FC = () => {
                   >
                     Cancel
                   </button>
-                  <button 
-                    type="submit" 
+                  <button
+                    type="submit"
                     className="submit-btn"
                     disabled={createMutation.isPending}
                   >
-                    {createMutation.isPending ? 'Creating...' : '✨ Create Subscription'}
+                    {createMutation.isPending
+                      ? "Creating..."
+                      : "✨ Create Subscription"}
                   </button>
                 </div>
               </form>
@@ -331,8 +383,12 @@ const Subscription: React.FC = () => {
           {!isEditing ? (
             <div className="subscription-card">
               <div className="subscription-status">
-                <span className={`status-badge ${subscription.active ? 'active' : 'paused'}`}>
-                  {subscription.active ? '✓ Active' : '⏸️ Paused'}
+                <span
+                  className={`status-badge ${
+                    subscription.active ? "active" : "paused"
+                  }`}
+                >
+                  {subscription.active ? "✓ Active" : "⏸️ Paused"}
                 </span>
                 <div className="status-actions">
                   <button
@@ -340,12 +396,9 @@ const Subscription: React.FC = () => {
                     onClick={() => toggleMutation.mutate()}
                     disabled={toggleMutation.isPending}
                   >
-                    {subscription.active ? '⏸️ Pause' : '▶️ Resume'}
+                    {subscription.active ? "⏸️ Pause" : "▶️ Resume"}
                   </button>
-                  <button
-                    className="edit-btn"
-                    onClick={handleEditSubscription}
-                  >
+                  <button className="edit-btn" onClick={handleEditSubscription}>
                     ✏️ Edit
                   </button>
                   <button
@@ -361,14 +414,18 @@ const Subscription: React.FC = () => {
               <div className="subscription-info">
                 <div className="info-item">
                   <span className="info-label">Plan Type:</span>
-                  <span className="info-value">{subscription.planType.toUpperCase()}</span>
+                  <span className="info-value">
+                    {subscription.planType.toUpperCase()}
+                  </span>
                 </div>
-                
+
                 {subscription.nextDeliveryDate && (
                   <div className="info-item">
                     <span className="info-label">Next Delivery:</span>
                     <span className="info-value">
-                      {new Date(subscription.nextDeliveryDate).toLocaleDateString()}
+                      {new Date(
+                        subscription.nextDeliveryDate
+                      ).toLocaleDateString()}
                     </span>
                   </div>
                 )}
@@ -376,14 +433,16 @@ const Subscription: React.FC = () => {
                 <div className="info-item">
                   <span className="info-label">Promo Alerts:</span>
                   <span className="info-value">
-                    {subscription.promoAlerts ? '✓ Enabled' : '✗ Disabled'}
+                    {subscription.promoAlerts ? "✓ Enabled" : "✗ Disabled"}
                   </span>
                 </div>
 
                 {subscription.preferences?.budget && (
                   <div className="info-item">
                     <span className="info-label">Budget:</span>
-                    <span className="info-value">{subscription.preferences.budget} per meal</span>
+                    <span className="info-value">
+                      {subscription.preferences.budget} per meal
+                    </span>
                   </div>
                 )}
 
@@ -391,9 +450,13 @@ const Subscription: React.FC = () => {
                   <div className="info-item">
                     <span className="info-label">Preferred Cuisines:</span>
                     <div className="preference-tags">
-                      {subscription.preferences.cuisines.map((cuisine: string) => (
-                        <span key={cuisine} className="preference-tag">{cuisine}</span>
-                      ))}
+                      {subscription.preferences.cuisines.map(
+                        (cuisine: string) => (
+                          <span key={cuisine} className="preference-tag">
+                            {cuisine}
+                          </span>
+                        )
+                      )}
                     </div>
                   </div>
                 )}
@@ -402,9 +465,13 @@ const Subscription: React.FC = () => {
                   <div className="info-item">
                     <span className="info-label">Dietary Restrictions:</span>
                     <div className="preference-tags">
-                      {subscription.preferences.dietaryRestrictions.map((restriction: string) => (
-                        <span key={restriction} className="preference-tag">{restriction}</span>
-                      ))}
+                      {subscription.preferences.dietaryRestrictions.map(
+                        (restriction: string) => (
+                          <span key={restriction} className="preference-tag">
+                            {restriction}
+                          </span>
+                        )
+                      )}
                     </div>
                   </div>
                 )}
@@ -414,19 +481,24 @@ const Subscription: React.FC = () => {
             <div className="edit-subscription-form">
               <h3>Edit Your Subscription</h3>
               <form onSubmit={handleUpdateSubscription}>
-                
                 {/* Plan Type */}
                 <div className="form-group">
                   <label>Plan Type</label>
                   <div className="plan-options">
-                    {['weekly', 'biweekly', 'monthly'].map(type => (
+                    {["weekly", "biweekly", "monthly"].map((type) => (
                       <button
                         key={type}
                         type="button"
-                        className={`plan-option ${planType === type ? 'active' : ''}`}
+                        className={`plan-option ${
+                          planType === type ? "active" : ""
+                        }`}
                         onClick={() => setPlanType(type as any)}
                       >
-                        {type === 'weekly' ? '📅 Weekly' : type === 'biweekly' ? '📆 Bi-Weekly' : '🗓️ Monthly'}
+                        {type === "weekly"
+                          ? "📅 Weekly"
+                          : type === "biweekly"
+                          ? "📆 Bi-Weekly"
+                          : "🗓️ Monthly"}
                       </button>
                     ))}
                   </div>
@@ -436,11 +508,13 @@ const Subscription: React.FC = () => {
                 <div className="form-group">
                   <label>Preferred Cuisines</label>
                   <div className="options-grid">
-                    {cuisineOptions.map(cuisine => (
+                    {cuisineOptions.map((cuisine) => (
                       <button
                         key={cuisine}
                         type="button"
-                        className={`option-btn ${cuisines.includes(cuisine) ? 'selected' : ''}`}
+                        className={`option-btn ${
+                          cuisines.includes(cuisine) ? "selected" : ""
+                        }`}
                         onClick={() => handleToggleCuisine(cuisine)}
                       >
                         {cuisine}
@@ -453,11 +527,15 @@ const Subscription: React.FC = () => {
                 <div className="form-group">
                   <label>Dietary Restrictions</label>
                   <div className="options-grid">
-                    {restrictionOptions.map(restriction => (
+                    {restrictionOptions.map((restriction) => (
                       <button
                         key={restriction}
                         type="button"
-                        className={`option-btn ${dietaryRestrictions.includes(restriction) ? 'selected' : ''}`}
+                        className={`option-btn ${
+                          dietaryRestrictions.includes(restriction)
+                            ? "selected"
+                            : ""
+                        }`}
                         onClick={() => handleToggleRestriction(restriction)}
                       >
                         {restriction}
@@ -470,11 +548,11 @@ const Subscription: React.FC = () => {
                 <div className="form-group">
                   <label>Budget per Meal</label>
                   <div className="budget-options">
-                    {budgetOptions.map(b => (
+                    {budgetOptions.map((b) => (
                       <button
                         key={b}
                         type="button"
-                        className={`budget-btn ${budget === b ? 'active' : ''}`}
+                        className={`budget-btn ${budget === b ? "active" : ""}`}
                         onClick={() => setBudget(b)}
                       >
                         {b}
@@ -496,8 +574,8 @@ const Subscription: React.FC = () => {
                 </div>
 
                 <div className="form-actions">
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     className="cancel-btn"
                     onClick={() => {
                       setIsEditing(false);
@@ -506,12 +584,14 @@ const Subscription: React.FC = () => {
                   >
                     Cancel
                   </button>
-                  <button 
-                    type="submit" 
+                  <button
+                    type="submit"
                     className="submit-btn"
                     disabled={updateMutation.isPending}
                   >
-                    {updateMutation.isPending ? 'Updating...' : '✓ Save Changes'}
+                    {updateMutation.isPending
+                      ? "Updating..."
+                      : "✓ Save Changes"}
                   </button>
                 </div>
               </form>
@@ -524,4 +604,3 @@ const Subscription: React.FC = () => {
 };
 
 export default Subscription;
-

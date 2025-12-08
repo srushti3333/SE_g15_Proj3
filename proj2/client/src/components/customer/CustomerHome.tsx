@@ -29,19 +29,19 @@
 // //           <h3>Browse Restaurants</h3>
 // //           <p>Discover amazing local restaurants</p>
 // //         </Link>
-        
+
 // //         <Link to="/customer/cart" className="action-card">
 // //           <div className="action-icon">🛒</div>
 // //           <h3>View Cart</h3>
 // //           <p>Check your current order</p>
 // //         </Link>
-        
+
 // //         <Link to="/customer/orders" className="action-card">
 // //           <div className="action-icon">📦</div>
 // //           <h3>Order History</h3>
 // //           <p>Track your past orders</p>
 // //         </Link>
-        
+
 // //         <Link to="/customer/quests" className="action-card">
 // //           <div className="action-icon">🎯</div>
 // //           <h3>Food Challenges</h3>
@@ -65,8 +65,8 @@
 // //                 <span className="rating">⭐ {restaurant.rating}</span>
 // //                 <span className="delivery-time">{restaurant.deliveryTime}</span>
 // //               </div>
-// //               <Link 
-// //                 to={`/customer/restaurants?restaurant=${restaurant.id}`} 
+// //               <Link
+// //                 to={`/customer/restaurants?restaurant=${restaurant.id}`}
 // //                 className="btn btn-primary"
 // //               >
 // //                 View Menu
@@ -104,7 +104,6 @@
 // // };
 
 // // export default CustomerHome;
-
 
 // import React from 'react';
 // import { Link } from 'react-router-dom';
@@ -154,19 +153,19 @@
 //           <h3>Browse Restaurants</h3>
 //           <p>Discover amazing local restaurants</p>
 //         </Link>
-        
+
 //         <Link to="/customer/cart" className="action-card">
 //           <div className="action-icon">🛒</div>
 //           <h3>View Cart</h3>
 //           <p>Check your current order</p>
 //         </Link>
-        
+
 //         <Link to="/customer/orders" className="action-card">
 //           <div className="action-icon">📦</div>
 //           <h3>Order History</h3>
 //           <p>Track your past orders</p>
 //         </Link>
-        
+
 //         <Link to="/customer/quests" className="action-card">
 //           <div className="action-icon">🎯</div>
 //           <h3>Food Challenges</h3>
@@ -202,8 +201,8 @@
 //                 <span className="rating">⭐ {restaurant.rating}</span>
 //                 <span className="delivery-time">{restaurant.deliveryTime}</span>
 //               </div>
-//               <Link 
-//                 to={`/customer/restaurants?restaurant=${restaurant.id}`} 
+//               <Link
+//                 to={`/customer/restaurants?restaurant=${restaurant.id}`}
 //                 className="btn btn-primary"
 //               >
 //                 View Menu
@@ -242,25 +241,25 @@
 
 // export default CustomerHome;
 
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { useAuth } from '../../contexts/AuthContext';
-import { api } from '../../services/api';
-import { promoApi } from '../../services/promo-api';
-import './CustomerHome.css';
+import React from "react";
+import { Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { useAuth } from "../../contexts/AuthContext";
+import { api } from "../../services/api";
+import { promoApi } from "../../services/promo-api";
+import "./CustomerHome.css";
 
 const CustomerHome: React.FC = () => {
   const { user } = useAuth();
 
   const { data: restaurants } = useQuery({
-    queryKey: ['restaurants'],
+    queryKey: ["restaurants"],
     queryFn: async () => {
       try {
-        const response = await api.get('/customer/restaurants');
+        const response = await api.get("/customer/restaurants");
         return response.data.restaurants;
       } catch (error) {
-        console.error('Error fetching restaurants:', error);
+        console.error("Error fetching restaurants:", error);
         return [];
       }
     },
@@ -268,14 +267,16 @@ const CustomerHome: React.FC = () => {
   });
 
   const { data: recentOrders } = useQuery({
-    queryKey: ['recentOrders', user?.id],
+    queryKey: ["recentOrders", user?.id],
     queryFn: async () => {
       try {
         // ✅ FIXED: Added customerId parameter
-        const response = await api.get(`/orders/customer?customerId=${user?.id}`);
+        const response = await api.get(
+          `/orders/customer?customerId=${user?.id}`
+        );
         return response.data.orders.slice(0, 3); // Get last 3 orders
       } catch (error) {
-        console.error('Error fetching recent orders:', error);
+        console.error("Error fetching recent orders:", error);
         return []; // Return empty array on error
       }
     },
@@ -284,12 +285,12 @@ const CustomerHome: React.FC = () => {
   });
 
   const { data: promos } = useQuery({
-    queryKey: ['activePromos'],
+    queryKey: ["activePromos"],
     queryFn: async () => {
       try {
         return await promoApi.getActivePromos();
       } catch (error) {
-        console.error('Error fetching promos:', error);
+        console.error("Error fetching promos:", error);
         return [];
       }
     },
@@ -305,19 +306,19 @@ const CustomerHome: React.FC = () => {
           <h3>Browse Restaurants</h3>
           <p>Discover amazing local restaurants</p>
         </Link>
-        
+
         <Link to="/customer/cart" className="action-card">
           <div className="action-icon">🛒</div>
           <h3>View Cart</h3>
           <p>Check your current order</p>
         </Link>
-        
+
         <Link to="/customer/orders" className="action-card">
           <div className="action-icon">📦</div>
           <h3>Order History</h3>
           <p>Track your past orders</p>
         </Link>
-        
+
         <Link to="/customer/quests" className="action-card">
           <div className="action-icon">🎯</div>
           <h3>Food Challenges</h3>
@@ -347,8 +348,12 @@ const CustomerHome: React.FC = () => {
                 <h3>{promo.title}</h3>
                 <p className="promo-restaurant">{promo.restaurantName}</p>
                 <p className="promo-description">{promo.description}</p>
-                <div className="promo-code">Code: <strong>{promo.code}</strong></div>
-                <p className="promo-validity">Valid until {new Date(promo.validUntil).toLocaleDateString()}</p>
+                <div className="promo-code">
+                  Code: <strong>{promo.code}</strong>
+                </div>
+                <p className="promo-validity">
+                  Valid until {new Date(promo.validUntil).toLocaleDateString()}
+                </p>
               </div>
             ))}
           </div>
@@ -371,8 +376,8 @@ const CustomerHome: React.FC = () => {
                 <span className="rating">⭐ {restaurant.rating}</span>
                 <span className="delivery-time">{restaurant.deliveryTime}</span>
               </div>
-              <Link 
-                to={`/customer/restaurants?restaurant=${restaurant.id}`} 
+              <Link
+                to={`/customer/restaurants?restaurant=${restaurant.id}`}
                 className="btn btn-primary"
               >
                 View Menu
@@ -392,11 +397,14 @@ const CustomerHome: React.FC = () => {
                   <h4>Order #{order.id.slice(-6)}</h4>
                   <p>Total: ${order.totalAmount}</p>
                   <span className={`status status-${order.status}`}>
-                    {order.status.replace('_', ' ').toUpperCase()}
+                    {order.status.replace("_", " ").toUpperCase()}
                   </span>
                 </div>
                 <div className="order-actions">
-                  <Link to={`/customer/orders/${order.id}`} className="btn btn-secondary">
+                  <Link
+                    to={`/customer/orders/${order.id}`}
+                    className="btn btn-secondary"
+                  >
                     View Details
                   </Link>
                 </div>
