@@ -1,4 +1,4 @@
-const { db } = require('../config/firebase');
+const { db } = require("../config/firebase");
 
 class Subscription {
   constructor(data) {
@@ -18,14 +18,14 @@ class Subscription {
   // Create a new subscription
   static async create(subscriptionData) {
     try {
-      const subscriptionRef = db.collection('subscriptions').doc();
+      const subscriptionRef = db.collection("subscriptions").doc();
       const subscriptionDoc = {
         id: subscriptionRef.id,
         ...subscriptionData,
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
-      
+
       await subscriptionRef.set(subscriptionDoc);
       return new Subscription(subscriptionDoc);
     } catch (error) {
@@ -36,19 +36,20 @@ class Subscription {
   // Get subscription by customer ID
   static async findByCustomerId(customerId) {
     try {
-      const subscriptionSnapshot = await db.collection('subscriptions')
-        .where('customerId', '==', customerId)
+      const subscriptionSnapshot = await db
+        .collection("subscriptions")
+        .where("customerId", "==", customerId)
         .get();
-      
+
       if (subscriptionSnapshot.empty) {
         return null;
       }
-      
+
       // Return the most recent subscription
-      const subscriptions = subscriptionSnapshot.docs.map(doc => 
-        new Subscription({ id: doc.id, ...doc.data() })
+      const subscriptions = subscriptionSnapshot.docs.map(
+        (doc) => new Subscription({ id: doc.id, ...doc.data() })
       );
-      
+
       // Sort by createdAt descending and return the first one
       subscriptions.sort((a, b) => b.createdAt - a.createdAt);
       return subscriptions[0];
@@ -60,12 +61,13 @@ class Subscription {
   // Get all active subscriptions
   static async findAllActive() {
     try {
-      const subscriptionSnapshot = await db.collection('subscriptions')
-        .where('active', '==', true)
+      const subscriptionSnapshot = await db
+        .collection("subscriptions")
+        .where("active", "==", true)
         .get();
-      
-      return subscriptionSnapshot.docs.map(doc => 
-        new Subscription({ id: doc.id, ...doc.data() })
+
+      return subscriptionSnapshot.docs.map(
+        (doc) => new Subscription({ id: doc.id, ...doc.data() })
       );
     } catch (error) {
       throw new Error(`Failed to find active subscriptions: ${error.message}`);
@@ -75,14 +77,14 @@ class Subscription {
   // Update subscription
   async update(updateData) {
     try {
-      const subscriptionRef = db.collection('subscriptions').doc(this.id);
+      const subscriptionRef = db.collection("subscriptions").doc(this.id);
       const updatePayload = {
         ...updateData,
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
-      
+
       await subscriptionRef.update(updatePayload);
-      
+
       // Update local instance
       Object.assign(this, updatePayload);
       return this;
@@ -94,10 +96,10 @@ class Subscription {
   // Update meal plan
   async updateMealPlan(mealPlan) {
     try {
-      const subscriptionRef = db.collection('subscriptions').doc(this.id);
+      const subscriptionRef = db.collection("subscriptions").doc(this.id);
       await subscriptionRef.update({
         mealPlan: mealPlan,
-        updatedAt: new Date()
+        updatedAt: new Date(),
       });
 
       this.mealPlan = mealPlan;
@@ -112,10 +114,10 @@ class Subscription {
   async toggleActive() {
     try {
       const newStatus = !this.active;
-      const subscriptionRef = db.collection('subscriptions').doc(this.id);
+      const subscriptionRef = db.collection("subscriptions").doc(this.id);
       await subscriptionRef.update({
         active: newStatus,
-        updatedAt: new Date()
+        updatedAt: new Date(),
       });
 
       this.active = newStatus;
@@ -129,7 +131,7 @@ class Subscription {
   // Delete subscription
   async delete() {
     try {
-      await db.collection('subscriptions').doc(this.id).delete();
+      await db.collection("subscriptions").doc(this.id).delete();
       return true;
     } catch (error) {
       throw new Error(`Failed to delete subscription: ${error.message}`);
@@ -149,10 +151,9 @@ class Subscription {
       nextDeliveryDate: this.nextDeliveryDate,
       promoAlerts: this.promoAlerts,
       createdAt: this.createdAt,
-      updatedAt: this.updatedAt
+      updatedAt: this.updatedAt,
     };
   }
 }
 
 module.exports = Subscription;
-

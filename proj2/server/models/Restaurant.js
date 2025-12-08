@@ -1,5 +1,5 @@
-const { db } = require('../config/firebase');
-const geofire = require('geofire-common');
+const { db } = require("../config/firebase");
+const geofire = require("geofire-common");
 
 function isValidCoordinate(location) {
   return (
@@ -18,13 +18,13 @@ class Restaurant {
     this.cuisine = data.cuisine;
     this.description = data.description;
     this.rating = data.rating || 0;
-    this.deliveryTime = data.deliveryTime || '30-45 min';
+    this.deliveryTime = data.deliveryTime || "30-45 min";
     this.isLocalLegend = data.isLocalLegend || false;
     this.menu = data.menu || [];
     this.ownerId = data.ownerId;
 
     // NEW: location support
-    this.location = data.location || null;  // {lat, lng}
+    this.location = data.location || null; // {lat, lng}
     this.geohash = data.geohash || null;
 
     this.address = data.address;
@@ -38,13 +38,13 @@ class Restaurant {
   // Create a new restaurant
   static async create(restaurantData) {
     try {
-      const restaurantRef = db.collection('restaurants').doc();
+      const restaurantRef = db.collection("restaurants").doc();
 
       let geohash = null;
       if (isValidCoordinate(restaurantData.location)) {
         geohash = geofire.geohashForLocation([
           restaurantData.location.lat,
-          restaurantData.location.lng
+          restaurantData.location.lng,
         ]);
       }
 
@@ -56,7 +56,7 @@ class Restaurant {
           : null,
         geohash,
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
 
       await restaurantRef.set(restaurantDoc);
@@ -66,11 +66,10 @@ class Restaurant {
     }
   }
 
-
   // Get restaurant by ID
   static async findById(id) {
     try {
-      const restaurantDoc = await db.collection('restaurants').doc(id).get();
+      const restaurantDoc = await db.collection("restaurants").doc(id).get();
       if (!restaurantDoc.exists) {
         return null;
       }
@@ -83,12 +82,13 @@ class Restaurant {
   // Get restaurant by owner ID
   static async findByOwnerId(ownerId) {
     try {
-      const restaurantsSnapshot = await db.collection('restaurants')
-        .where('ownerId', '==', ownerId)
+      const restaurantsSnapshot = await db
+        .collection("restaurants")
+        .where("ownerId", "==", ownerId)
         .get();
-      
-      return restaurantsSnapshot.docs.map(doc => 
-        new Restaurant({ id: doc.id, ...doc.data() })
+
+      return restaurantsSnapshot.docs.map(
+        (doc) => new Restaurant({ id: doc.id, ...doc.data() })
       );
     } catch (error) {
       throw new Error(`Failed to find restaurants by owner: ${error.message}`);
@@ -98,12 +98,13 @@ class Restaurant {
   // Get all active restaurants
   static async findAll() {
     try {
-      const restaurantsSnapshot = await db.collection('restaurants')
-        .where('isActive', '==', true)
+      const restaurantsSnapshot = await db
+        .collection("restaurants")
+        .where("isActive", "==", true)
         .get();
-      
-      return restaurantsSnapshot.docs.map(doc => 
-        new Restaurant({ id: doc.id, ...doc.data() })
+
+      return restaurantsSnapshot.docs.map(
+        (doc) => new Restaurant({ id: doc.id, ...doc.data() })
       );
     } catch (error) {
       throw new Error(`Failed to find restaurants: ${error.message}`);
@@ -115,7 +116,7 @@ class Restaurant {
     try {
       let updatePayload = {
         ...updateData,
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
 
       // Location updated?
@@ -123,7 +124,7 @@ class Restaurant {
         if (isValidCoordinate(updateData.location)) {
           updatePayload.geohash = geofire.geohashForLocation([
             updateData.location.lat,
-            updateData.location.lng
+            updateData.location.lng,
           ]);
         } else {
           updatePayload.location = null;
@@ -131,7 +132,7 @@ class Restaurant {
         }
       }
 
-      await db.collection('restaurants').doc(this.id).update(updatePayload);
+      await db.collection("restaurants").doc(this.id).update(updatePayload);
 
       Object.assign(this, updatePayload);
       return this;
@@ -143,12 +144,12 @@ class Restaurant {
   // Update menu
   async updateMenu(menuItems) {
     try {
-      const restaurantRef = db.collection('restaurants').doc(this.id);
+      const restaurantRef = db.collection("restaurants").doc(this.id);
       await restaurantRef.update({
         menu: menuItems,
-        updatedAt: new Date()
+        updatedAt: new Date(),
       });
-      
+
       this.menu = menuItems;
       this.updatedAt = new Date();
       return this;
@@ -160,7 +161,7 @@ class Restaurant {
   // Delete restaurant
   async delete() {
     try {
-      await db.collection('restaurants').doc(this.id).delete();
+      await db.collection("restaurants").doc(this.id).delete();
       return true;
     } catch (error) {
       throw new Error(`Failed to delete restaurant: ${error.message}`);
@@ -186,7 +187,7 @@ class Restaurant {
       email: this.email,
       isActive: this.isActive,
       createdAt: this.createdAt,
-      updatedAt: this.updatedAt
+      updatedAt: this.updatedAt,
     };
   }
 }

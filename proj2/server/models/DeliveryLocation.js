@@ -1,5 +1,5 @@
 // models/deliveryLocation.js
-const { db } = require('../config/firebase');
+const { db } = require("../config/firebase");
 
 class DeliveryLocation {
   constructor(data) {
@@ -7,19 +7,21 @@ class DeliveryLocation {
     this.orderId = data.orderId || null;
     this.lat = data.lat;
     this.lng = data.lng;
-    this.updatedAt = data.updatedAt ? data.updatedAt.toDate?.() || data.updatedAt : new Date();
+    this.updatedAt = data.updatedAt
+      ? data.updatedAt.toDate?.() || data.updatedAt
+      : new Date();
   }
 
   static async setLocation({ riderId, orderId, lat, lng }) {
     try {
-      if (!riderId) throw new Error('riderId required');
-      const docRef = db.collection('delivery_locations').doc(riderId);
+      if (!riderId) throw new Error("riderId required");
+      const docRef = db.collection("delivery_locations").doc(riderId);
       const payload = {
         riderId,
         orderId: orderId || null,
         lat,
         lng,
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
       await docRef.set(payload, { merge: true });
       return new DeliveryLocation(payload);
@@ -30,7 +32,7 @@ class DeliveryLocation {
 
   static async getLocationByRiderId(riderId) {
     try {
-      const doc = await db.collection('delivery_locations').doc(riderId).get();
+      const doc = await db.collection("delivery_locations").doc(riderId).get();
       if (!doc.exists) return null;
       return new DeliveryLocation({ ...doc.data() });
     } catch (err) {
@@ -40,15 +42,18 @@ class DeliveryLocation {
 
   static async getLocationByOrderId(orderId) {
     try {
-      const snap = await db.collection('delivery_locations')
-        .where('orderId', '==', orderId)
+      const snap = await db
+        .collection("delivery_locations")
+        .where("orderId", "==", orderId)
         .limit(1)
         .get();
       if (snap.empty) return null;
       const doc = snap.docs[0];
       return new DeliveryLocation({ ...doc.data() });
     } catch (err) {
-      throw new Error(`Failed to get delivery location by orderId: ${err.message}`);
+      throw new Error(
+        `Failed to get delivery location by orderId: ${err.message}`
+      );
     }
   }
 }

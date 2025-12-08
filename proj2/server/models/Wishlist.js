@@ -1,4 +1,4 @@
-const { db } = require('../config/firebase');
+const { db } = require("../config/firebase");
 
 class Wishlist {
   constructor(data) {
@@ -12,14 +12,14 @@ class Wishlist {
   // Create a new wishlist entry
   static async create(wishlistData) {
     try {
-      const wishlistRef = db.collection('wishlists').doc();
+      const wishlistRef = db.collection("wishlists").doc();
       const wishlistDoc = {
         id: wishlistRef.id,
         ...wishlistData,
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
-      
+
       await wishlistRef.set(wishlistDoc);
       return new Wishlist(wishlistDoc);
     } catch (error) {
@@ -30,16 +30,17 @@ class Wishlist {
   // Get wishlist by customer ID
   static async findByCustomerId(customerId) {
     try {
-      const wishlistSnapshot = await db.collection('wishlists')
-        .where('customerId', '==', customerId)
+      const wishlistSnapshot = await db
+        .collection("wishlists")
+        .where("customerId", "==", customerId)
         .limit(1)
         .get();
-      
+
       if (wishlistSnapshot.empty) {
         // Create a new wishlist if none exists
         return await Wishlist.create({ customerId, items: [] });
       }
-      
+
       const wishlistDoc = wishlistSnapshot.docs[0];
       return new Wishlist({ id: wishlistDoc.id, ...wishlistDoc.data() });
     } catch (error) {
@@ -51,23 +52,26 @@ class Wishlist {
   async addItem(item) {
     try {
       // Check if item already exists
-      const existingItem = this.items.find(i => 
-        i.itemId === item.itemId && i.type === item.type
+      const existingItem = this.items.find(
+        (i) => i.itemId === item.itemId && i.type === item.type
       );
-      
+
       if (existingItem) {
         return this; // Item already in wishlist
       }
 
-      const updatedItems = [...this.items, {
-        ...item,
-        addedAt: new Date()
-      }];
+      const updatedItems = [
+        ...this.items,
+        {
+          ...item,
+          addedAt: new Date(),
+        },
+      ];
 
-      const wishlistRef = db.collection('wishlists').doc(this.id);
+      const wishlistRef = db.collection("wishlists").doc(this.id);
       await wishlistRef.update({
         items: updatedItems,
-        updatedAt: new Date()
+        updatedAt: new Date(),
       });
 
       this.items = updatedItems;
@@ -81,14 +85,14 @@ class Wishlist {
   // Remove item from wishlist
   async removeItem(itemId, type) {
     try {
-      const updatedItems = this.items.filter(item => 
-        !(item.itemId === itemId && item.type === type)
+      const updatedItems = this.items.filter(
+        (item) => !(item.itemId === itemId && item.type === type)
       );
 
-      const wishlistRef = db.collection('wishlists').doc(this.id);
+      const wishlistRef = db.collection("wishlists").doc(this.id);
       await wishlistRef.update({
         items: updatedItems,
-        updatedAt: new Date()
+        updatedAt: new Date(),
       });
 
       this.items = updatedItems;
@@ -102,10 +106,10 @@ class Wishlist {
   // Clear all items from wishlist
   async clearAll() {
     try {
-      const wishlistRef = db.collection('wishlists').doc(this.id);
+      const wishlistRef = db.collection("wishlists").doc(this.id);
       await wishlistRef.update({
         items: [],
-        updatedAt: new Date()
+        updatedAt: new Date(),
       });
 
       this.items = [];
@@ -123,10 +127,9 @@ class Wishlist {
       customerId: this.customerId,
       items: this.items,
       createdAt: this.createdAt,
-      updatedAt: this.updatedAt
+      updatedAt: this.updatedAt,
     };
   }
 }
 
 module.exports = Wishlist;
-

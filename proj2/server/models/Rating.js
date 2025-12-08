@@ -310,29 +310,28 @@
 
 // module.exports = Rating;
 
-
-
-
-const { db } = require('../config/firebase');
+const { db } = require("../config/firebase");
 
 class Rating {
-
   // Helper: extract numeric rating from variety of shapes
   static _extractCustomerRating(orderData) {
     if (!orderData.ratings) return null;
 
     const rCustomer = orderData.ratings.customer;
-    if (rCustomer && typeof rCustomer.rating === 'number') return rCustomer.rating;
-    if (rCustomer && typeof rCustomer.restaurant === 'number') return rCustomer.restaurant;
-    if (typeof orderData.ratings.rating === 'number') return orderData.ratings.rating;
-    if (typeof orderData.rating === 'number') return orderData.rating;
+    if (rCustomer && typeof rCustomer.rating === "number")
+      return rCustomer.rating;
+    if (rCustomer && typeof rCustomer.restaurant === "number")
+      return rCustomer.restaurant;
+    if (typeof orderData.ratings.rating === "number")
+      return orderData.ratings.rating;
+    if (typeof orderData.rating === "number") return orderData.rating;
 
     return null;
   }
 
   // Helper: extract review text
   static _extractCustomerReview(orderData) {
-    if (!orderData.ratings) return '';
+    if (!orderData.ratings) return "";
 
     const rCustomer = orderData.ratings.customer;
     if (rCustomer && rCustomer.review) {
@@ -342,7 +341,7 @@ class Rating {
     if (orderData.ratings.review) return orderData.ratings.review;
     if (orderData.review) return orderData.review;
 
-    return '';
+    return "";
   }
 
   // Helper: extract rated date
@@ -361,8 +360,9 @@ class Rating {
   static async _resolveRestaurantIds(passedId) {
     if (!passedId) return [];
 
-    const ordersCheck = await db.collection('orders')
-      .where('restaurantId', '==', passedId)
+    const ordersCheck = await db
+      .collection("orders")
+      .where("restaurantId", "==", passedId)
       .limit(1)
       .get();
 
@@ -370,12 +370,13 @@ class Rating {
       return [passedId];
     }
 
-    const restaurantsSnapshot = await db.collection('restaurants')
-      .where('ownerId', '==', passedId)
+    const restaurantsSnapshot = await db
+      .collection("restaurants")
+      .where("ownerId", "==", passedId)
       .get();
 
     if (!restaurantsSnapshot.empty) {
-      return restaurantsSnapshot.docs.map(d => d.id);
+      return restaurantsSnapshot.docs.map((d) => d.id);
     }
 
     return [passedId];
@@ -391,16 +392,21 @@ class Rating {
       }
 
       // Get ALL orders for this restaurant, filter in memory
-      const ordersSnapshot = await db.collection('orders')
-        .where('restaurantId', '==', restaurantIds[0])
+      const ordersSnapshot = await db
+        .collection("orders")
+        .where("restaurantId", "==", restaurantIds[0])
         .get();
 
       if (ordersSnapshot.empty) {
-        await db.collection('restaurants').doc(restaurantIds[0]).update({
-          rating: 0,
-          totalRatings: 0,
-          updatedAt: new Date()
-        }).catch(() => {});
+        await db
+          .collection("restaurants")
+          .doc(restaurantIds[0])
+          .update({
+            rating: 0,
+            totalRatings: 0,
+            updatedAt: new Date(),
+          })
+          .catch(() => {});
 
         return { averageRating: 0, totalRatings: 0 };
       }
@@ -408,7 +414,7 @@ class Rating {
       let totalRating = 0;
       let ratingCount = 0;
 
-      ordersSnapshot.forEach(doc => {
+      ordersSnapshot.forEach((doc) => {
         const orderData = doc.data();
         const ratingVal = Rating._extractCustomerRating(orderData);
         if (ratingVal != null) {
@@ -417,23 +423,25 @@ class Rating {
         }
       });
 
-      const averageRating = ratingCount > 0 ? (totalRating / ratingCount).toFixed(1) : 0;
+      const averageRating =
+        ratingCount > 0 ? (totalRating / ratingCount).toFixed(1) : 0;
 
-      await db.collection('restaurants')
+      await db
+        .collection("restaurants")
         .doc(restaurantIds[0])
         .update({
           rating: parseFloat(averageRating),
           totalRatings: ratingCount,
-          updatedAt: new Date()
-        }).catch(() => {});
+          updatedAt: new Date(),
+        })
+        .catch(() => {});
 
       return {
         averageRating: parseFloat(averageRating),
-        totalRatings: ratingCount
+        totalRatings: ratingCount,
       };
-
     } catch (error) {
-      console.error('Error updating restaurant rating:', error);
+      console.error("Error updating restaurant rating:", error);
       throw new Error(`Failed to update restaurant rating: ${error.message}`);
     }
   }
@@ -441,28 +449,29 @@ class Rating {
   // Get restaurant ratings WITH REVIEWS
   static async getRestaurantRatings(restaurantId) {
     try {
-      console.log('📡 Fetching ratings for restaurant:', restaurantId);
-      
+      console.log("📡 Fetching ratings for restaurant:", restaurantId);
+
       const restaurantIds = await Rating._resolveRestaurantIds(restaurantId);
-      console.log('Resolved IDs:', restaurantIds);
+      console.log("Resolved IDs:", restaurantIds);
 
       if (restaurantIds.length === 0) {
-        console.log('❌ No restaurant IDs found');
+        console.log("❌ No restaurant IDs found");
         return [];
       }
 
       // Get ALL orders for this restaurant (no != null query to avoid index issues)
-      const ordersSnapshot = await db.collection('orders')
-        .where('restaurantId', '==', restaurantIds[0])
+      const ordersSnapshot = await db
+        .collection("orders")
+        .where("restaurantId", "==", restaurantIds[0])
         .get();
 
       console.log(`📦 Found ${ordersSnapshot.size} total orders`);
 
       const ratings = [];
 
-      ordersSnapshot.forEach(doc => {
+      ordersSnapshot.forEach((doc) => {
         const orderData = doc.data();
-        
+
         // Skip orders without ratings
         if (!orderData.ratings) {
           return;
@@ -476,7 +485,7 @@ class Rating {
           hasRating: !!ratingVal,
           rating: ratingVal,
           hasReview: !!reviewText,
-          reviewLength: reviewText ? reviewText.length : 0
+          reviewLength: reviewText ? reviewText.length : 0,
         });
 
         if (ratingVal != null) {
@@ -484,8 +493,8 @@ class Rating {
             orderId: doc.id,
             customerId: orderData.customerId,
             rating: ratingVal,
-            review: reviewText || '',
-            ratedAt: ratedAt
+            review: reviewText || "",
+            ratedAt: ratedAt,
           });
         }
       });
@@ -499,10 +508,9 @@ class Rating {
 
       console.log(`✅ Returning ${ratings.length} ratings with reviews`);
       return ratings;
-
     } catch (error) {
-      console.error('❌ Error fetching restaurant ratings:', error);
-      console.error('Error stack:', error.stack);
+      console.error("❌ Error fetching restaurant ratings:", error);
+      console.error("Error stack:", error.stack);
       throw new Error(`Failed to fetch ratings: ${error.message}`);
     }
   }
@@ -516,20 +524,21 @@ class Rating {
         return {
           averageRating: 0,
           totalRatings: 0,
-          ratingDistribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
+          ratingDistribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
         };
       }
 
       // Get ALL orders, filter in memory
-      const ordersSnapshot = await db.collection('orders')
-        .where('restaurantId', '==', restaurantIds[0])
+      const ordersSnapshot = await db
+        .collection("orders")
+        .where("restaurantId", "==", restaurantIds[0])
         .get();
 
       if (ordersSnapshot.empty) {
         return {
           averageRating: 0,
           totalRatings: 0,
-          ratingDistribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
+          ratingDistribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
         };
       }
 
@@ -537,7 +546,7 @@ class Rating {
       let ratingCount = 0;
       const ratingDistribution = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
 
-      ordersSnapshot.forEach(doc => {
+      ordersSnapshot.forEach((doc) => {
         const orderData = doc.data();
         const rating = Rating._extractCustomerRating(orderData);
         if (rating != null) {
@@ -549,16 +558,16 @@ class Rating {
         }
       });
 
-      const averageRating = ratingCount > 0 ? (totalRating / ratingCount).toFixed(1) : 0;
+      const averageRating =
+        ratingCount > 0 ? (totalRating / ratingCount).toFixed(1) : 0;
 
       return {
         averageRating: parseFloat(averageRating),
         totalRatings: ratingCount,
-        ratingDistribution
+        ratingDistribution,
       };
-
     } catch (error) {
-      console.error('Error fetching rating stats:', error);
+      console.error("Error fetching rating stats:", error);
       throw new Error(`Failed to fetch rating stats: ${error.message}`);
     }
   }

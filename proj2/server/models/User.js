@@ -1,4 +1,4 @@
-const { db } = require('../config/firebase');
+const { db } = require("../config/firebase");
 
 class User {
   constructor(data) {
@@ -7,7 +7,8 @@ class User {
     this.password = data.password;
     this.role = data.role; // 'customer', 'restaurant', 'delivery'
     this.profile = data.profile;
-    this.deliveryStatus = data.deliveryStatus || (data.role === 'delivery' ? 'free' : null); // 'free', 'busy'
+    this.deliveryStatus =
+      data.deliveryStatus || (data.role === "delivery" ? "free" : null); // 'free', 'busy'
     this.createdAt = data.createdAt || new Date();
     this.updatedAt = data.updatedAt || new Date();
   }
@@ -15,14 +16,14 @@ class User {
   // Create a new user
   static async create(userData) {
     try {
-      const userRef = db.collection('users').doc();
+      const userRef = db.collection("users").doc();
       const userDoc = {
         id: userRef.id,
         ...userData,
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
-      
+
       await userRef.set(userDoc);
       return new User(userDoc);
     } catch (error) {
@@ -33,7 +34,7 @@ class User {
   // Get user by ID
   static async findById(id) {
     try {
-      const userDoc = await db.collection('users').doc(id).get();
+      const userDoc = await db.collection("users").doc(id).get();
       if (!userDoc.exists) {
         return null;
       }
@@ -46,15 +47,16 @@ class User {
   // Get user by email
   static async findByEmail(email) {
     try {
-      const usersSnapshot = await db.collection('users')
-        .where('email', '==', email)
+      const usersSnapshot = await db
+        .collection("users")
+        .where("email", "==", email)
         .limit(1)
         .get();
-      
+
       if (usersSnapshot.empty) {
         return null;
       }
-      
+
       const userDoc = usersSnapshot.docs[0];
       return new User({ id: userDoc.id, ...userDoc.data() });
     } catch (error) {
@@ -65,14 +67,14 @@ class User {
   // Update user
   async update(updateData) {
     try {
-      const userRef = db.collection('users').doc(this.id);
+      const userRef = db.collection("users").doc(this.id);
       const updatePayload = {
         ...updateData,
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
-      
+
       await userRef.update(updatePayload);
-      
+
       // Update local instance
       Object.assign(this, updatePayload);
       return this;
@@ -84,7 +86,7 @@ class User {
   // Delete user
   async delete() {
     try {
-      await db.collection('users').doc(this.id).delete();
+      await db.collection("users").doc(this.id).delete();
       return true;
     } catch (error) {
       throw new Error(`Failed to delete user: ${error.message}`);
@@ -94,12 +96,13 @@ class User {
   // Get all users by role
   static async findByRole(role) {
     try {
-      const usersSnapshot = await db.collection('users')
-        .where('role', '==', role)
+      const usersSnapshot = await db
+        .collection("users")
+        .where("role", "==", role)
         .get();
-      
-      return usersSnapshot.docs.map(doc => 
-        new User({ id: doc.id, ...doc.data() })
+
+      return usersSnapshot.docs.map(
+        (doc) => new User({ id: doc.id, ...doc.data() })
       );
     } catch (error) {
       throw new Error(`Failed to find users by role: ${error.message}`);
@@ -109,13 +112,14 @@ class User {
   // Find free delivery riders
   static async findFreeRiders() {
     try {
-      const usersSnapshot = await db.collection('users')
-        .where('role', '==', 'delivery')
-        .where('deliveryStatus', '==', 'free')
+      const usersSnapshot = await db
+        .collection("users")
+        .where("role", "==", "delivery")
+        .where("deliveryStatus", "==", "free")
         .get();
-      
-      return usersSnapshot.docs.map(doc => 
-        new User({ id: doc.id, ...doc.data() })
+
+      return usersSnapshot.docs.map(
+        (doc) => new User({ id: doc.id, ...doc.data() })
       );
     } catch (error) {
       throw new Error(`Failed to find free riders: ${error.message}`);
@@ -125,12 +129,12 @@ class User {
   // Update delivery status
   async updateDeliveryStatus(status) {
     try {
-      const userRef = db.collection('users').doc(this.id);
+      const userRef = db.collection("users").doc(this.id);
       await userRef.update({
         deliveryStatus: status,
-        updatedAt: new Date()
+        updatedAt: new Date(),
       });
-      
+
       this.deliveryStatus = status;
       this.updatedAt = new Date();
       return this;
@@ -142,10 +146,10 @@ class User {
   // Update last known location timestamp or arbitrary small fields
   async updateMeta(meta = {}) {
     try {
-      const userRef = db.collection('users').doc(this.id);
+      const userRef = db.collection("users").doc(this.id);
       const payload = {
         ...meta,
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
       await userRef.update(payload);
       Object.assign(this, payload);
@@ -164,7 +168,7 @@ class User {
       profile: this.profile,
       deliveryStatus: this.deliveryStatus,
       createdAt: this.createdAt,
-      updatedAt: this.updatedAt
+      updatedAt: this.updatedAt,
     };
   }
 }

@@ -1,4 +1,4 @@
-const { db } = require('../config/firebase');
+const { db } = require("../config/firebase");
 
 class Quest {
   constructor(data) {
@@ -16,13 +16,13 @@ class Quest {
 
   static async create(questData) {
     try {
-      const questRef = db.collection('quests').doc();
+      const questRef = db.collection("quests").doc();
       const questDoc = {
         id: questRef.id,
         ...questData,
-        createdAt: new Date()
+        createdAt: new Date(),
       };
-      
+
       await questRef.set(questDoc);
       return new Quest(questDoc);
     } catch (error) {
@@ -32,7 +32,7 @@ class Quest {
 
   static async findById(id) {
     try {
-      const questDoc = await db.collection('quests').doc(id).get();
+      const questDoc = await db.collection("quests").doc(id).get();
       if (!questDoc.exists) {
         return null;
       }
@@ -44,12 +44,13 @@ class Quest {
 
   static async getActiveQuests() {
     try {
-      const questsSnapshot = await db.collection('quests')
-        .where('isActive', '==', true)
+      const questsSnapshot = await db
+        .collection("quests")
+        .where("isActive", "==", true)
         .get();
-      
-      return questsSnapshot.docs.map(doc => 
-        new Quest({ id: doc.id, ...doc.data() })
+
+      return questsSnapshot.docs.map(
+        (doc) => new Quest({ id: doc.id, ...doc.data() })
       );
     } catch (error) {
       throw new Error(`Failed to get active quests: ${error.message}`);
@@ -67,7 +68,7 @@ class Quest {
       difficulty: this.difficulty,
       isActive: this.isActive,
       createdAt: this.createdAt,
-      expiresAt: this.expiresAt
+      expiresAt: this.expiresAt,
     };
   }
 }

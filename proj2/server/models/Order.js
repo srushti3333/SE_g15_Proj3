@@ -1,6 +1,6 @@
-const { db } = require('../config/firebase');
+const { db } = require("../config/firebase");
 // near other static methods
-const DeliveryLocation = require('./deliveryLocation');
+const DeliveryLocation = require("./deliveryLocation");
 
 class Order {
   constructor(data) {
@@ -12,8 +12,8 @@ class Order {
     this.totalAmount = data.totalAmount;
     this.status = data.status; // 'pending', 'accepted', 'rejected', 'preparing', 'ready', 'picked_up', 'delivered', 'cancelled'
     this.deliveryAddress = data.deliveryAddress;
-    this.specialInstructions = data.specialInstructions || '';
-    this.paymentMethod = data.paymentMethod || 'cash_on_delivery';
+    this.specialInstructions = data.specialInstructions || "";
+    this.paymentMethod = data.paymentMethod || "cash_on_delivery";
     this.createdAt = data.createdAt || new Date();
     this.updatedAt = data.updatedAt || new Date();
     this.deliveredAt = data.deliveredAt || null;
@@ -23,13 +23,13 @@ class Order {
   // Create a new order
   static async create(orderData) {
     try {
-      const orderRef = db.collection('orders').doc();
+      const orderRef = db.collection("orders").doc();
       const orderDoc = {
         id: orderRef.id,
         ...orderData,
-        status: 'pending',
+        status: "pending",
         createdAt: new Date(),
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
 
       await orderRef.set(orderDoc);
@@ -42,7 +42,7 @@ class Order {
   // Get order by ID
   static async findById(id) {
     try {
-      const orderDoc = await db.collection('orders').doc(id).get();
+      const orderDoc = await db.collection("orders").doc(id).get();
       if (!orderDoc.exists) {
         return null;
       }
@@ -55,13 +55,14 @@ class Order {
   // Get orders by customer ID
   static async findByCustomerId(customerId) {
     try {
-      const ordersSnapshot = await db.collection('orders')
-        .where('customerId', '==', customerId)
-        .orderBy('createdAt', 'desc')
+      const ordersSnapshot = await db
+        .collection("orders")
+        .where("customerId", "==", customerId)
+        .orderBy("createdAt", "desc")
         .get();
 
-      return ordersSnapshot.docs.map(doc =>
-        new Order({ id: doc.id, ...doc.data() })
+      return ordersSnapshot.docs.map(
+        (doc) => new Order({ id: doc.id, ...doc.data() })
       );
     } catch (error) {
       throw new Error(`Failed to find orders by customer: ${error.message}`);
@@ -71,13 +72,14 @@ class Order {
   // Get orders by restaurant ID
   static async findByRestaurantId(restaurantId) {
     try {
-      const ordersSnapshot = await db.collection('orders')
-        .where('restaurantId', '==', restaurantId)
-        .orderBy('createdAt', 'desc')
+      const ordersSnapshot = await db
+        .collection("orders")
+        .where("restaurantId", "==", restaurantId)
+        .orderBy("createdAt", "desc")
         .get();
 
-      return ordersSnapshot.docs.map(doc =>
-        new Order({ id: doc.id, ...doc.data() })
+      return ordersSnapshot.docs.map(
+        (doc) => new Order({ id: doc.id, ...doc.data() })
       );
     } catch (error) {
       throw new Error(`Failed to find orders by restaurant: ${error.message}`);
@@ -87,29 +89,32 @@ class Order {
   // Get orders by delivery partner ID
   static async findByDeliveryPartnerId(deliveryPartnerId) {
     try {
-      const ordersSnapshot = await db.collection('orders')
-        .where('deliveryPartnerId', '==', deliveryPartnerId)
-        .orderBy('createdAt', 'desc')
+      const ordersSnapshot = await db
+        .collection("orders")
+        .where("deliveryPartnerId", "==", deliveryPartnerId)
+        .orderBy("createdAt", "desc")
         .get();
 
-      return ordersSnapshot.docs.map(doc =>
-        new Order({ id: doc.id, ...doc.data() })
+      return ordersSnapshot.docs.map(
+        (doc) => new Order({ id: doc.id, ...doc.data() })
       );
     } catch (error) {
-      throw new Error(`Failed to find orders by delivery partner: ${error.message}`);
+      throw new Error(
+        `Failed to find orders by delivery partner: ${error.message}`
+      );
     }
   }
 
   // Update order status
   async updateStatus(newStatus) {
     try {
-      const orderRef = db.collection('orders').doc(this.id);
+      const orderRef = db.collection("orders").doc(this.id);
       const updateData = {
         status: newStatus,
-        updatedAt: new Date()
+        updatedAt: new Date(),
       };
 
-      if (newStatus === 'delivered') {
+      if (newStatus === "delivered") {
         updateData.deliveredAt = new Date();
       }
 
@@ -118,7 +123,7 @@ class Order {
       // Update local instance
       this.status = newStatus;
       this.updatedAt = updateData.updatedAt;
-      if (newStatus === 'delivered') {
+      if (newStatus === "delivered") {
         this.deliveredAt = updateData.deliveredAt;
       }
 
@@ -131,10 +136,10 @@ class Order {
   // Assign delivery partner
   async assignDeliveryPartner(deliveryPartnerId) {
     try {
-      const orderRef = db.collection('orders').doc(this.id);
+      const orderRef = db.collection("orders").doc(this.id);
       await orderRef.update({
         deliveryPartnerId,
-        updatedAt: new Date()
+        updatedAt: new Date(),
       });
 
       this.deliveryPartnerId = deliveryPartnerId;
@@ -146,22 +151,21 @@ class Order {
     }
   }
 
- 
   // Add rating
   async addRating(raterRole, ratingData) {
     try {
-      const orderRef = db.collection('orders').doc(this.id);
+      const orderRef = db.collection("orders").doc(this.id);
       const currentRatings = this.ratings || {};
 
       currentRatings[raterRole] = {
         rating: ratingData.rating,
         review: ratingData.review || null,
-        ratedAt: new Date()
+        ratedAt: new Date(),
       };
 
       await orderRef.update({
         ratings: currentRatings,
-        updatedAt: new Date()
+        updatedAt: new Date(),
       });
 
       this.ratings = currentRatings;
@@ -173,11 +177,13 @@ class Order {
     }
   }
 
-    // Get delivery partner's latest location for this order
+  // Get delivery partner's latest location for this order
   async getDeliveryPartnerLocation() {
     try {
       if (!this.deliveryPartnerId) return null;
-      const loc = await DeliveryLocation.getLocationByRiderId(this.deliveryPartnerId);
+      const loc = await DeliveryLocation.getLocationByRiderId(
+        this.deliveryPartnerId
+      );
       return loc;
     } catch (err) {
       throw new Error(`Failed to get partner location: ${err.message}`);
@@ -187,13 +193,14 @@ class Order {
   // Get pending orders for restaurant
   static async getPendingOrders() {
     try {
-      const ordersSnapshot = await db.collection('orders')
-        .where('status', '==', 'pending')
-        .orderBy('createdAt', 'asc')
+      const ordersSnapshot = await db
+        .collection("orders")
+        .where("status", "==", "pending")
+        .orderBy("createdAt", "asc")
         .get();
 
-      return ordersSnapshot.docs.map(doc =>
-        new Order({ id: doc.id, ...doc.data() })
+      return ordersSnapshot.docs.map(
+        (doc) => new Order({ id: doc.id, ...doc.data() })
       );
     } catch (error) {
       throw new Error(`Failed to get pending orders: ${error.message}`);
@@ -216,7 +223,7 @@ class Order {
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
       deliveredAt: this.deliveredAt,
-      ratings: this.ratings
+      ratings: this.ratings,
     };
   }
 }
