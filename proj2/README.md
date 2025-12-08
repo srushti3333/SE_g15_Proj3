@@ -522,19 +522,6 @@ This project is licensed under the MIT License - see the [LICENSE.md](docs/LICEN
 
 ---
 
-## 🌟 Why Choose Hungry Wolf for Project 3?
-
-1. **Well-Documented**: Comprehensive docs and inline comments
-2. **Thoroughly Tested**: 267 test cases with 91% coverage on business logic
-3. **Modular Architecture**: Easy to extend with new features
-4. **Modern Tech Stack**: React 19, Node.js 22, Firebase Admin
-5. **Active Development**: Regular commits and updates
-6. **Clear Roadmap**: 4+ milestones ready for Project 3
-7. **Real-World Application**: Production-ready food delivery platform
-8. **Unique Features**: Gamification, quests, promotions, subscriptions
-
----
-
 **⭐ Star this repo if you find it useful!**
 
 **🔗 [Live Demo](https://drive.google.com/file/d/1R85vYgjbKL3zBZsimE7ruI46UfgAdN8x/view?usp=drive_link) | [Documentation](docs/) | [Issues](https://github.com/srushti3333/SE_g15_Proj3/issues) | [Discussions](https://github.com/srushti3333/SE_g15_Proj3/discussions)**
