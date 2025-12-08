@@ -28,6 +28,20 @@ const Navbar: React.FC = () => {
     }
   };
 
+  const getProfileLink = () => {
+    if (!user) return '/';
+    switch (user.role) {
+      case 'customer':
+        return '/customer/profile';
+      case 'restaurant':
+        return '/restaurant/profile';
+      case 'delivery':
+        return '/delivery/profile';
+      default:
+        return '/';
+    }
+  };
+
   return (
     <nav className="navbar">
       <div className="navbar-container">
@@ -111,7 +125,8 @@ const Navbar: React.FC = () => {
                 </span>
 
                 {/* Link to profile page */}
-                <Link to="/customer/profile" className="btn btn-secondary">
+                {/* Dynamic Profile link */}
+                <Link to={getProfileLink()} className="btn btn-secondary">
                   Profile
                 </Link>
 
