@@ -7,7 +7,7 @@ import RestaurantHome from '../components/restaurant/RestaurantHome';
 import OrderManagement from '../components/restaurant/OrderManagement';
 import MenuManagement from '../components/restaurant/MenuManagement';
 import Profile from '../components/restaurant/Profile';
-import AdminDashboard from '../components/analytics/AdminDashboard'; 
+import RestaurantAnalytics from '../components/analytics/RestaurantAnalytics'; 
 import PromoManagement from '../components/restaurant/PromoManagement';
 import RatingsManagement from '../components/restaurant/RatingsManagement';
 import './Dashboard.css';
@@ -79,7 +79,7 @@ const RestaurantDashboard: React.FC = () => {
           <Route path="/ratings" element={<RatingsManagement />} />
           <Route path="/promos" element={<PromoManagement />} />
           <Route path="/profile" element={<Profile />} />
-          <Route path="/analytics" element={<AdminDashboard />} />
+          <Route path="/analytics" element={<RestaurantAnalytics />} />
         </Routes>
       </div>
     </div>
