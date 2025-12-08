@@ -92,7 +92,6 @@ Discover nearby restaurants with geolocation and distance sorting
 - **Restaurants** - Manage menus, orders, promotions, and view analytics
 - **Delivery Partners** - Accept deliveries, track earnings
 - **Administrators** - Monitor platform analytics and performance
-- **Local Communities** - Benefit from donation programs
 
 ---
 
@@ -111,15 +110,13 @@ Discover nearby restaurants with geolocation and distance sorting
 - Delivery partner assignment
 - Rating system
 
-#### Milestone 3: Gamification
+#### Milestone 3: Points system based on Order
 - Points system for orders (10% of bill)
 - Points display on dashboard
 - Rewards and discounts
 
-#### Milestone 4: Social Impact
-- Local Legends restaurants
-- Meal-for-a-Meal donation counter
-- Enhanced reward points (15%) for local restaurants
+#### Milestone 4: Manual Feedback System   
+- Listening, learning, improving based on feedbacks
 
 ### 🍁 November Release - Engagement Amplifiers ✅
 
@@ -297,10 +294,9 @@ We have **267 comprehensive test cases** with 91% code coverage on business logi
 # All tests from project root (267 tests)
 npm test
 
-# Backend tests only (5 tests)
 cd server && npm test
 
-# Business logic tests (262 tests - includes quest system)
+# Business logic tests (262 tests)
 npm test
 
 # With coverage report
@@ -309,32 +305,16 @@ npm test -- --coverage
 
 ### Test Breakdown by Category
 
-#### 🔧 Backend API Tests (5 tests)
-- **Order Routes**: 3 tests (order creation, status updates)
-- **Delivery Location**: 2 tests (location tracking)
-
 #### 🎯 Business Logic Tests (262 tests)
-- **Core Business Logic**: 130 tests
-  - Points System: 28 tests
-  - Order Management: 25 tests
-  - User Roles & Permissions: 20 tests
-  - Restaurant Features: 15 tests
-  - Rating System: 10 tests
-  - Edge Cases: 32 tests
-- **Quest System**: 132 tests
-  - Quest Progress: 20 tests
-  - Weekend Detection: 15 tests
-  - Quest Completion: 15 tests
-  - Reward Validation: 15 tests
-  - Quest Logic Functions: 15 tests
-  - Cuisine Tracking: 15 tests
-  - Quest Type Validation: 15 tests
-  - Edge Cases: 15 tests
-  - Model Validation: 7 tests
+- **Core Business Logic**
+- **Analytics Logic**
+- **Location based Restaurant tests**
+- **Wishlist and Promotion tests**
+- **Profile Logic**
+- **Quest System**
 
-**Total: 267 Tests** | **Coverage: 91% (business logic)** | **All Passing ✅**
 
-For detailed testing guide, see [TESTING.md](TESTING.md)
+**Total: 267 Tests** | **Coverage: 91%** | **All Passing ✅**
 
 ---
 
@@ -349,12 +329,10 @@ For detailed testing guide, see [TESTING.md](TESTING.md)
 
 ### Feature Documentation
 - [🧪 Testing Guide](TESTING.md) - Test cases and coverage
-- [📊 Test Summary](TEST_SUMMARY.md) - Detailed test breakdown
 - [🐛 GitHub Issues](GITHUB_ISSUES.md) - Issue templates and examples
 - [🏆 Badge Setup](BADGE_SETUP.md) - Configure badges for forked repo
 
 ### Quick Links
-- [🎯 Project Roadmap](#-planned-milestones-for-version-20-project-3-ready)
 - [🔧 Troubleshooting](docs/INSTALL.md#troubleshooting)
 - [💡 Feature Requests](https://github.com/srushti3333/SE_g15_Proj3/issues/new)
 
@@ -379,18 +357,12 @@ For detailed testing guide, see [TESTING.md](TESTING.md)
 - ⭐ **Rating Analytics** - View detailed rating statistics
 - 📊 **Performance Dashboard** - Track revenue and popular items
 - 🏆 **Local Legend Status** - Earn recognition for high ratings
+- 📦 **Order Analytics** - Analyze order trends
+- 🏪 **Restaurant Insights** - Track restaurant performance
 
 ### For Delivery Partners
 - 🚚 **Order Assignment** - Accept delivery requests
-- 📍 **Route Optimization** - Efficient delivery routing
 - 💰 **Earnings Tracking** - Monitor delivery income
-
-### For Administrators
-- 📊 **Analytics Dashboard** - Comprehensive business metrics
-- 👥 **User Management** - Monitor customer activity
-- 🏪 **Restaurant Insights** - Track restaurant performance
-- 📦 **Order Analytics** - Analyze order trends
-- ❤️ **Donation Tracking** - Monitor social impact
 
 ---
 
@@ -456,13 +428,10 @@ We welcome contributions! This project is designed to be extended by future team
 ## 📊 Project Statistics
 
 - **Total Commits**: 200+
-- **Contributors**: 5 active developers
+- **Contributors**: 8 developers
 - **Test Cases**: 267 automated tests (all passing ✅)
-- **Code Coverage**: 91% (business logic)
-- **Issues Closed**: 25+
-- **Pull Requests**: 40+ merged
+- **Code Coverage**: 91% 
 - **Lines of Code**: 15,000+
-- **API Endpoints**: 50+ RESTful endpoints
 
 ---
 
