@@ -6,6 +6,7 @@ import { api } from '../services/api';
 import DeliveryHome from '../components/delivery/DeliveryHome';
 import OrderManagement from '../components/delivery/OrderManagement';
 import Profile from '../components/delivery/Profile';
+import DeliveryAnalytics from '../components/analytics/DeliveryAnalytics';
 import './Dashboard.css';
 
 const DeliveryDashboard: React.FC = () => {
@@ -51,6 +52,7 @@ const DeliveryDashboard: React.FC = () => {
           <Route path="/" element={<DeliveryHome />} />
           <Route path="/orders" element={<OrderManagement />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/analytics" element={<DeliveryAnalytics />} />
         </Routes>
       </div>
     </div>
