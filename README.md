@@ -17,7 +17,7 @@
 
 **Watch our latest features in action:**
 
-[![Hungry Wolf Demo](https://img.youtube.com/vi/YOUR_VIDEO_ID/maxresdefault.jpg)](https://drive.google.com/file/d/1R85vYgjbKL3zBZsimE7ruI46UfgAdN8x/view?usp=drive_link)
+[![Hungry Wolf Demo](https://img.youtube.com/vi/YOUR_VIDEO_ID/maxresdefault.jpg)](https://drive.google.com/file/d/1WgG5_hvFzIyP5Snn2EOvfFoRVvINM3bJ/view?usp=sharing)
 
 *Click above to watch the 2-minute demo showcasing our new Project 2 features!*
 
