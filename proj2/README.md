@@ -13,15 +13,19 @@
 
 ---
 
-## 🎬 Demo Video (2 Minutes)
+## 🎬 Demo Video
 
-**Watch our latest features in action:**
+<div align="center">
 
-[![Hungry Wolf Demo](https://img.youtube.com/vi/YOUR_VIDEO_ID/maxresdefault.jpg)](https://drive.google.com/file/d/1R85vYgjbKL3zBZsimE7ruI46UfgAdN8x/view?usp=drive_link)
+<a href="https://drive.google.com/file/d/1WgG5_hvFzIyP5Snn2EOvfFoRVvINM3bJ/view">
+  <img src="docs/images/video-thumbnail.png" alt="Watch Demo" width="600px">
+  <br>
+  <img src="https://img.shields.io/badge/▶️_CLICK_TO_PLAY-FF0000?style=for-the-badge&logo=youtube&logoColor=white" alt="Play Video">
+</a>
 
-*Click above to watch the 2-minute demo showcasing our new Project 2 features!*
+<p><em>Click above to watch the 2-minute demo showcasing our new Project 2 features!</em></p>
 
----
+</div>
 
 ## 🎯 Mission Statement
 
