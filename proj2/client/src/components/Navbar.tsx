@@ -116,6 +116,12 @@ const Navbar: React.FC = () => {
                 </Link>
               )}
 
+              {user.role === 'delivery' && (
+                <Link to="/delivery/analytics" className="navbar-link">
+                  Analytics
+                </Link>
+              )}
+
               <div className="navbar-user">
                 <span className="user-name">
                   {user.profile?.name || user.email}
