@@ -29,26 +29,25 @@ interface OrdersData {
   ordersByStatus: Array<{ status: string; count: number; color: string }>;
 }
 
-const OrdersAnalytics: React.FC = () => {
+const OrdersAnalytics: React.FC<{ restaurantId?: string }> = ({ restaurantId }) => {
   const [timeRange, setTimeRange] = useState<'week' | 'month' | 'year'>('month');
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<OrdersData | null>(null);
 
   useEffect(() => {
-    fetchOrdersData();
-  }, [timeRange]);
+    if (restaurantId) {
+      fetchOrdersData();
+    }
+  }, [timeRange, restaurantId]);
 
   const fetchOrdersData = async () => {
     setLoading(true);
     try {
-      // API Endpoint: GET /api/analytics/orders?range={timeRange}
-      // Expected Response: OrdersData shape as defined above
-      const response = await fetch(`/api/analytics/orders?range=${timeRange}`);
+      const response = await fetch(`/api/analytics/orders/restaurant/${restaurantId}?range=${timeRange}`);
       const result = await response.json();
       setData(result);
     } catch (error) {
       console.error('Error fetching orders analytics:', error);
-      // Using mock data for demonstration
       setData(getMockOrdersData());
     } finally {
       setLoading(false);

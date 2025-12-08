@@ -33,21 +33,21 @@ interface DonationData {
   monthlyGrowth: Array<{ month: string; donations: number; growth: number }>;
 }
 
-const DonationAnalytics: React.FC = () => {
+const DonationAnalytics: React.FC<{ restaurantId?: string }> = ({ restaurantId }) => {
   const [timeRange, setTimeRange] = useState<'week' | 'month' | 'year'>('month');
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<DonationData | null>(null);
 
   useEffect(() => {
-    fetchDonationData();
-  }, [timeRange]);
+    if (restaurantId) {
+      fetchDonationData();
+    }
+  }, [timeRange, restaurantId]);
 
   const fetchDonationData = async () => {
     setLoading(true);
     try {
-      // API Endpoint: GET /api/analytics/donations?range={timeRange}
-      // Expected Response: DonationData shape as defined above
-      const response = await fetch(`/api/analytics/donations?range=${timeRange}`);
+      const response = await fetch(`/api/analytics/donations/restaurant/${restaurantId}?range=${timeRange}`);
       const result = await response.json();
       setData(result);
     } catch (error) {

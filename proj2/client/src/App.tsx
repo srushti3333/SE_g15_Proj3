@@ -14,8 +14,7 @@ import RestaurantDashboard from './pages/RestaurantDashboard';
 import DeliveryDashboard from './pages/DeliveryDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 
-// NEW – Admin analytics dashboard
-import AdminDashboard from "./components/analytics/AdminDashboard";
+
 
 // Create a client
 const queryClient = new QueryClient({
@@ -71,15 +70,7 @@ function App() {
                     }
                   />
 
-                  {/* NEW — Admin analytics route */}
-                  <Route
-                    path="/admin/analytics"
-                    element={
-                      <ProtectedRoute allowedRoles={['admin']}>
-                        <AdminDashboard />
-                      </ProtectedRoute>
-                    }
-                  />
+
 
                   {/* Redirect unknown routes */}
                   <Route path="*" element={<Navigate to="/" replace />} />

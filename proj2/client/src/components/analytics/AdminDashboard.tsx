@@ -1,27 +1,26 @@
 import React, { useState } from 'react';
+import { useAuth } from '../../contexts/AuthContext';
 import OrdersAnalytics from './OrdersAnalytics';
-import CustomerAnalytics from './CustomerAnalytics';
 import RestaurantAnalytics from './RestaurantAnalytics';
 import DonationAnalytics from './DonationAnalytics';
 import './AdminDashboard.css';
 
-type TabType = 'orders' | 'customers' | 'restaurants' | 'donations';
+type TabType = 'orders' | 'restaurants' | 'donations';
 
 const AdminDashboard: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<TabType>('orders');
+  const { user } = useAuth();
+  const [activeTab, setActiveTab] = useState<TabType>('restaurants');
 
   const renderActiveTab = () => {
     switch (activeTab) {
       case 'orders':
-        return <OrdersAnalytics />;
-      case 'customers':
-        return <CustomerAnalytics />;
+        return <OrdersAnalytics restaurantId={user?.id} />;
       case 'restaurants':
         return <RestaurantAnalytics />;
       case 'donations':
-        return <DonationAnalytics />;
+        return <DonationAnalytics restaurantId={user?.id} />;
       default:
-        return <OrdersAnalytics />;
+        return <RestaurantAnalytics />;
     }
   };
 
@@ -40,16 +39,10 @@ const AdminDashboard: React.FC = () => {
           📦 Orders
         </button>
         <button
-          className={`tab-btn ${activeTab === 'customers' ? 'active' : ''}`}
-          onClick={() => setActiveTab('customers')}
-        >
-          👥 Customers
-        </button>
-        <button
           className={`tab-btn ${activeTab === 'restaurants' ? 'active' : ''}`}
           onClick={() => setActiveTab('restaurants')}
         >
-          🍽️ Restaurants
+          🍽️ Restaurant
         </button>
         <button
           className={`tab-btn ${activeTab === 'donations' ? 'active' : ''}`}

@@ -179,6 +179,7 @@ import Quests from '../components/customer/Quests';
 import Profile from '../components/customer/Profile';
 import Wishlist from '../components/customer/Wishlist';
 import Subscription from '../components/customer/Subscription';
+import CustomerAnalytics from '../components/analytics/CustomerAnalytics';
 import './Dashboard.css';
 
 // Error Boundary Component
@@ -333,6 +334,11 @@ const CustomerDashboard: React.FC = () => {
               <Route path="subscription" element={
                 <ErrorBoundary>
                   <Subscription />
+                </ErrorBoundary>
+              } />
+              <Route path="analytics" element={
+                <ErrorBoundary>
+                  <CustomerAnalytics />
                 </ErrorBoundary>
               } />
             </Routes>
