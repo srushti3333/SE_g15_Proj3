@@ -483,11 +483,15 @@ export class AnalyticsHelpers {
     date: Date,
     format: 'short' | 'medium' | 'long' = 'medium'
   ): string {
-    const options: Intl.DateTimeFormatOptions = {
-      short: { month: 'numeric', day: 'numeric', year: '2-digit' },
-      medium: { month: 'short', day: 'numeric', year: 'numeric' },
-      long: { month: 'long', day: 'numeric', year: 'numeric' },
-    }[format];
+    let options: Intl.DateTimeFormatOptions;
+    
+    if (format === 'short') {
+      options = { month: 'numeric', day: 'numeric', year: '2-digit' };
+    } else if (format === 'long') {
+      options = { month: 'long', day: 'numeric', year: 'numeric' };
+    } else {
+      options = { month: 'short', day: 'numeric', year: 'numeric' };
+    }
 
     return new Intl.DateTimeFormat('en-US', options).format(date);
   }
