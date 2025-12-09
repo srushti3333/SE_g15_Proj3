@@ -75,6 +75,12 @@ const Navbar: React.FC = () => {
               )}
 
               {user.role === 'customer' && (
+                <Link to="/customer/analytics" className="navbar-link">
+                  Analytics
+                </Link>
+              )}
+
+              {user.role === 'customer' && (
                 <Link to="/customer/cart" className="navbar-link cart-link">
                   Cart ({getTotalItems()})
                 </Link>
